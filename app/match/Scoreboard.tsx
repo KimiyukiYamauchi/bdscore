@@ -30,7 +30,7 @@ type MatchState = {
   matchOver: boolean;
   matchWinner?: Side;
 
-  server: Side;       // サーブ側（A/B）
+  server: Side; // サーブ側（A/B）
   serverCourt: Court; // 現在サーブ位置（L/R）
 
   // ★ ダブルス用：左右の並び
@@ -42,6 +42,9 @@ type MatchState = {
 
 type Snapshot = MatchState;
 
+const safeText = (s: string | undefined, fallback: string) =>
+  s && s.trim().length > 0 ? s : fallback;
+
 function deepClone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v));
 }
@@ -50,7 +53,13 @@ function gamesNeeded(bestOf: 1 | 3): number {
   return Math.floor(bestOf / 2) + 1;
 }
 
-function winsIfScores(a: number, b: number, who: Side, pointsToWin: number, cap: number): boolean {
+function winsIfScores(
+  a: number,
+  b: number,
+  who: Side,
+  pointsToWin: number,
+  cap: number
+): boolean {
   const na = who === "A" ? a + 1 : a;
   const nb = who === "B" ? b + 1 : b;
   const diff = Math.abs(na - nb);
@@ -59,7 +68,12 @@ function winsIfScores(a: number, b: number, who: Side, pointsToWin: number, cap:
   return false;
 }
 
-function judgeGame(a: number, b: number, pointsToWin: number, cap: number): { over: boolean; winner?: Side } {
+function judgeGame(
+  a: number,
+  b: number,
+  pointsToWin: number,
+  cap: number
+): { over: boolean; winner?: Side } {
   if (a >= cap || b >= cap) return { over: true, winner: a > b ? "A" : "B" };
   const diff = Math.abs(a - b);
   if ((a >= pointsToWin || b >= pointsToWin) && diff >= 2) {
@@ -68,7 +82,12 @@ function judgeGame(a: number, b: number, pointsToWin: number, cap: number): { ov
   return { over: false };
 }
 
-function isDeuce(a: number, b: number, pointsToWin: number, cap: number): boolean {
+function isDeuce(
+  a: number,
+  b: number,
+  pointsToWin: number,
+  cap: number
+): boolean {
   const threshold = pointsToWin - 1;
   return a >= threshold && b >= threshold && a === b && a < cap && b < cap;
 }
@@ -241,15 +260,20 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
   const a = state.game.a;
   const b = state.game.b;
 
-  const aGamePoint = !state.game.over && winsIfScores(a, b, "A", settings.pointsToWin, settings.cap);
-  const bGamePoint = !state.game.over && winsIfScores(a, b, "B", settings.pointsToWin, settings.cap);
+  const aGamePoint =
+    !state.game.over &&
+    winsIfScores(a, b, "A", settings.pointsToWin, settings.cap);
+  const bGamePoint =
+    !state.game.over &&
+    winsIfScores(a, b, "B", settings.pointsToWin, settings.cap);
 
   const aMatchPoint = aGamePoint && state.gamesWonA === need - 1;
   const bMatchPoint = bGamePoint && state.gamesWonB === need - 1;
 
   const statusLine = (() => {
     if (state.matchOver) return `マッチ終了：${state.matchWinner} 勝利`;
-    if (state.game.over) return `ゲーム終了：${state.game.winner} がこのゲームに勝利`;
+    if (state.game.over)
+      return `ゲーム終了：${state.game.winner} がこのゲームに勝利`;
     if (isDeuce(a, b, settings.pointsToWin, settings.cap)) return "デュース";
     if (aMatchPoint && bMatchPoint) return "両者マッチポイント";
     if (aMatchPoint) return "A マッチポイント";
@@ -301,7 +325,8 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
             <div className={styles.side}>A</div>
             {state.server === "A" && (
               <div className={styles.servePill}>
-                サーブ中 <span className={styles.courtMini}>{state.serverCourt}</span>
+                サーブ中{" "}
+                <span className={styles.courtMini}>{state.serverCourt}</span>
               </div>
             )}
           </div>
@@ -311,15 +336,19 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
             <div className={styles.pairCell}>
               <div className={styles.pairLabel}>L</div>
               <div className={styles.pairName}>
-                {state.formation.A.left}
-                {state.server === "A" && state.serverCourt === "L" && <span className={styles.dot} />}
+                {safeText(state.formation.A.left, "A-L")}
+                {state.server === "A" && state.serverCourt === "L" && (
+                  <span className={styles.dot} />
+                )}
               </div>
             </div>
             <div className={styles.pairCell}>
               <div className={styles.pairLabel}>R</div>
               <div className={styles.pairName}>
-                {state.formation.A.right}
-                {state.server === "A" && state.serverCourt === "R" && <span className={styles.dot} />}
+                {safeText(state.formation.A.right, "A-R")}
+                {state.server === "A" && state.serverCourt === "R" && (
+                  <span className={styles.dot} />
+                )}
               </div>
             </div>
           </div>
@@ -336,7 +365,10 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
           <div className={styles.games}>Games: {state.gamesWonA}</div>
 
           {mode === "doubles" && (
-            <button className={styles.smallBtn} onClick={() => swapLeftRight("A")}>
+            <button
+              className={styles.smallBtn}
+              onClick={() => swapLeftRight("A")}
+            >
               A 左右入替（手動）
             </button>
           )}
@@ -348,7 +380,8 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
             <div className={styles.side}>B</div>
             {state.server === "B" && (
               <div className={styles.servePill}>
-                サーブ中 <span className={styles.courtMini}>{state.serverCourt}</span>
+                サーブ中{" "}
+                <span className={styles.courtMini}>{state.serverCourt}</span>
               </div>
             )}
           </div>
@@ -358,15 +391,19 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
             <div className={styles.pairCell}>
               <div className={styles.pairLabel}>L</div>
               <div className={styles.pairName}>
-                {state.formation.B.left}
-                {state.server === "B" && state.serverCourt === "L" && <span className={styles.dot} />}
+                {safeText(state.formation.B.left, "B-L")}
+                {state.server === "B" && state.serverCourt === "L" && (
+                  <span className={styles.dot} />
+                )}
               </div>
             </div>
             <div className={styles.pairCell}>
               <div className={styles.pairLabel}>R</div>
               <div className={styles.pairName}>
-                {state.formation.B.right}
-                {state.server === "B" && state.serverCourt === "R" && <span className={styles.dot} />}
+                {safeText(state.formation.B.right, "B-R")}
+                {state.server === "B" && state.serverCourt === "R" && (
+                  <span className={styles.dot} />
+                )}
               </div>
             </div>
           </div>
@@ -383,7 +420,10 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
           <div className={styles.games}>Games: {state.gamesWonB}</div>
 
           {mode === "doubles" && (
-            <button className={styles.smallBtn} onClick={() => swapLeftRight("B")}>
+            <button
+              className={styles.smallBtn}
+              onClick={() => swapLeftRight("B")}
+            >
               B 左右入替（手動）
             </button>
           )}
@@ -391,7 +431,11 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
       </div>
 
       <div className={styles.controls}>
-        <button className={styles.ctrlBtn} onClick={undo} disabled={history.length === 0}>
+        <button
+          className={styles.ctrlBtn}
+          onClick={undo}
+          disabled={history.length === 0}
+        >
           アンドゥ
         </button>
         <button
@@ -402,7 +446,11 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
         >
           次のゲーム
         </button>
-        <button className={styles.ctrlBtn} onClick={swapServe} disabled={state.matchOver}>
+        <button
+          className={styles.ctrlBtn}
+          onClick={swapServe}
+          disabled={state.matchOver}
+        >
           サーブ交代
         </button>
         <button className={styles.dangerBtn} onClick={resetMatch}>
