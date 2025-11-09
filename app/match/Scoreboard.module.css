@@ -29,10 +29,10 @@
   border: 1px solid #e5e7eb;
   border-radius: 16px;
   padding: 18px;
-  box-shadow: 0 4px 16px rgba(0,0,0,.05);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   display: grid;
-  grid-template-rows: auto 1fr auto auto;
-  gap: 10px;
+  grid-template-rows: auto auto auto auto; /* まずは全部autoで安定化 */
+  row-gap: 10px;
 }
 
 .side {
@@ -41,10 +41,20 @@
 }
 
 .score {
-  font-size: clamp(48px, 10vw, 88px);
-  font-weight: 700;
-  line-height: 1;
+  /* 元: font-size: clamp(48px, 10vw, 88px); line-height: 1; text-align: center; */
+  font-size: clamp(56px, 14vw, 112px); /* 余裕を持たせる */
+  line-height: 1.15; /* iOSで潰れない行高 */
+  color: #111827; /* 明示的に黒系 */
   text-align: center;
+
+  display: flex; /* 高さ確保と中央寄せを確実に */
+  align-items: center;
+  justify-content: center;
+  min-height: 1.2em; /* “高さ0”を防ぐ */
+  /* 描画安定化（iOSで稀に必要） */
+  -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
 }
 
 .pointBtn {
@@ -60,7 +70,7 @@
 }
 
 .pointBtn:disabled {
-  opacity: .5;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
@@ -179,8 +189,13 @@
 
 /* 既存定義はそのまま。以下を追加 */
 
-.modeSwitch { margin-right: 8px; }
-.labelSmall { font-size: 12px; color: #6b7280; }
+.modeSwitch {
+  margin-right: 8px;
+}
+.labelSmall {
+  font-size: 12px;
+  color: #6b7280;
+}
 .modeSelect {
   font-size: 12px;
   border: 1px solid #d1d5db;
@@ -189,7 +204,10 @@
   background: #fff;
 }
 
-.serverName { font-size: 12px; color: #374151; }
+.serverName {
+  font-size: 12px;
+  color: #374151;
+}
 
 .pairRow {
   display: grid;
