@@ -1,4 +1,5 @@
 import { buildSettings } from "../_lib/parse";
+import Scoreboard from "@/app/match/Scoreboard";
 
 type Props = {
   searchParams?: { [key: string]: string | string[] | undefined };
@@ -10,12 +11,11 @@ export default function MatchPage({ searchParams }: Props) {
 
   return (
     <main style={{ padding: 24 }}>
-      <h1>スコアボード（デモ）</h1>
-      <p>Best of: {settings.bestOf}</p>
-      <p>Points to Win: {settings.pointsToWin}</p>
-      <p>Cap（上限）: {settings.cap}</p>
-
-      {/* ここに実際のスコアボードUIやロジック（useReducer 等）を組み込み */}
+      <h1 style={{ marginBottom: 12 }}>バドミントン スコアボード</h1>
+      <p style={{ color: "#6b7280", marginBottom: 20 }}>
+        Best of: {settings.bestOf}／Points to Win: {settings.pointsToWin}／Cap: {settings.cap}
+      </p>
+      <Scoreboard settings={settings} />
     </main>
   );
 }

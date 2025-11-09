@@ -1,0 +1,106 @@
+.wrap {
+  max-width: 840px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 12px;
+  color: #374151;
+}
+
+.status {
+  font-weight: 600;
+  color: #111827;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 8px 0 16px;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.05);
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  gap: 10px;
+}
+
+.side {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.score {
+  font-size: clamp(48px, 10vw, 88px);
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+}
+
+.pointBtn {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  background: #10b981;
+  color: #fff;
+  cursor: pointer;
+}
+
+.pointBtn:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+.games {
+  text-align: right;
+  color: #4b5563;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin: 8px 0 6px;
+}
+
+.ctrlBtn {
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.dangerBtn {
+  padding: 10px 12px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: #fff;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.meta {
+  margin-top: 6px;
+  display: flex;
+  gap: 16px;
+  color: #6b7280;
+  font-size: 14px;
+}
