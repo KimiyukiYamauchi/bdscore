@@ -104,3 +104,75 @@
   color: #6b7280;
   font-size: 14px;
 }
+
+/* 既存 …（省略） */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 6px;
+  color: #374151;
+}
+
+.status {
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 12px;
+}
+
+/* ★ サーブ表示（ヘッダ右側） */
+.serve {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.serveLabel {
+  font-size: 12px;
+  color: #6b7280;
+}
+.serveSide {
+  font-weight: 700;
+  font-size: 16px;
+}
+.courtBadge {
+  display: inline-block;
+  min-width: 28px;
+  text-align: center;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: #0ea5e9;
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* ★ 各カード内のサーブ中ピル */
+.sideRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.servePill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  color: #0f172a;
+  border: 1px solid #e2e8f0;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 12px;
+}
+.courtMini {
+  display: inline-block;
+  min-width: 20px;
+  text-align: center;
+  background: #0ea5e9;
+  color: #fff;
+  border-radius: 9999px;
+  font-weight: 800;
+  padding: 0 6px;
+  line-height: 18px;
+}
