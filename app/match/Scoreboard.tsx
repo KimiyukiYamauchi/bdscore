@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import styles from "@/app/match/Scoreboard.module.css";
 
 type Side = "A" | "B";
+type Court = "L" | "R";
+type Mode = "singles" | "doubles";
 
 export type MatchSettings = {
   bestOf: 1 | 3;
@@ -18,6 +20,8 @@ type GameState = {
   winner?: Side;
 };
 
+type Pair = { left: string; right: string };
+
 type MatchState = {
   gameIndex: number;
   gamesWonA: number;
@@ -26,9 +30,14 @@ type MatchState = {
   matchOver: boolean;
   matchWinner?: Side;
 
-  // ★ 追加：サーブ権とサービスコート
-  server: Side;           // いまサーブしている側
-  serverCourt: "L" | "R"; // いまのサーブ位置（Left/Right）
+  server: Side;       // サーブ側（A/B）
+  serverCourt: Court; // 現在サーブ位置（L/R）
+
+  // ★ ダブルス用：左右の並び
+  formation: {
+    A: Pair;
+    B: Pair;
+  };
 };
 
 type Snapshot = MatchState;
@@ -64,13 +73,32 @@ function isDeuce(a: number, b: number, pointsToWin: number, cap: number): boolea
   return a >= threshold && b >= threshold && a === b && a < cap && b < cap;
 }
 
-// ★ 偶奇からサービスコートを決定（偶数=R、奇数=L）
-function courtFromPoints(points: number): "L" | "R" {
+// 偶奇からサービスコートを決定（偶数=R、奇数=L）
+function courtFromPoints(points: number): Court {
   return points % 2 === 0 ? "R" : "L";
+}
+
+// ★ 回転（ダブルス時のみ使用）：対象サイドの左右をスワップ
+function rotateServingSide(formation: { A: Pair; B: Pair }, side: Side) {
+  const f = deepClone(formation);
+  const p = f[side];
+  f[side] = { left: p.right, right: p.left };
+  return f;
+}
+
+// 現在サーブを打つ「選手名」を返す（視覚表示用）
+function currentServerName(state: MatchState): string {
+  const side = state.server;
+  const court = state.serverCourt; // L or R
+  const pair = state.formation[side];
+  return court === "L" ? pair.left : pair.right;
 }
 
 export default function Scoreboard({ settings }: { settings: MatchSettings }) {
   const need = useMemo(() => gamesNeeded(settings.bestOf), [settings.bestOf]);
+
+  // ★ ここでモードを切り替え可能（初期は "singles"）
+  const [mode, setMode] = useState<Mode>("doubles"); // ←初期からダブルスを試したい場合は "doubles"
 
   const [state, setState] = useState<MatchState>({
     gameIndex: 0,
@@ -78,9 +106,13 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
     gamesWonB: 0,
     game: { a: 0, b: 0, over: false },
     matchOver: false,
-    // 初期サーブは A、0点なので R から
     server: "A",
     serverCourt: "R",
+    formation: {
+      // デモ用の仮名。実装拡張で入力可能にできます
+      A: { left: "A-L", right: "A-R" },
+      B: { left: "B-L", right: "B-R" },
+    },
   });
 
   const [history, setHistory] = useState<Snapshot[]>([]);
@@ -102,19 +134,29 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
     const nextB = state.game.b + (who === "B" ? 1 : 0);
     const judged = judgeGame(nextA, nextB, settings.pointsToWin, settings.cap);
 
-    // ★ サーブ権とコートの更新
+    // サーブ権・コート・回転の更新
     let nextServer: Side;
-    let nextCourt: "L" | "R";
+    let nextCourt: Court;
+    let nextFormation = state.formation;
+
     if (who === state.server) {
-      // サーブ側が取った → サーブ継続、サーバー側の点で偶奇判定
+      // サーブ側が得点 → サーブ継続、サーバー側の点数の偶奇で L/R
       const serverPoints = who === "A" ? nextA : nextB;
       nextServer = state.server;
       nextCourt = courtFromPoints(serverPoints);
+
+      // ★ ダブルス時のみ回転（サーブ側だけ左右スワップ）
+      if (mode === "doubles") {
+        nextFormation = rotateServingSide(state.formation, state.server);
+      }
     } else {
-      // レシーブ側が取った → サーブ権移動、新サーバーの点で偶奇判定
+      // レシーブ側が得点 → サーブ権移動、新サーバー側の点数の偶奇で L/R
       nextServer = who;
       const serverPoints = nextServer === "A" ? nextA : nextB;
       nextCourt = courtFromPoints(serverPoints);
+
+      // ★ ダブルスでもレシーブ側得点時は回転しない（左右そのまま）
+      nextFormation = state.formation;
     }
 
     let next: MatchState = {
@@ -122,13 +164,14 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
       game: { a: nextA, b: nextB, over: judged.over, winner: judged.winner },
       server: nextServer,
       serverCourt: nextCourt,
+      formation: nextFormation,
     };
 
     if (judged.over && judged.winner) {
       if (judged.winner === "A") next.gamesWonA += 1;
       else next.gamesWonB += 1;
 
-      // ★ マッチ終了判定
+      // マッチ終了判定
       if (next.gamesWonA >= need || next.gamesWonB >= need) {
         next.matchOver = true;
         next.matchWinner = next.gamesWonA > next.gamesWonB ? "A" : "B";
@@ -142,7 +185,7 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
     if (!state.game.over || state.matchOver) return;
     pushHistory();
 
-    // ★ 次ゲームの開始サーバー＝前ゲーム勝者、開始コートは 0 点なので R
+    // 次ゲーム開始サーバー＝前ゲーム勝者／開始コートは 0 点なので R
     const starter: Side = state.game.winner ?? state.server;
 
     setState((s) => ({
@@ -151,6 +194,8 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
       game: { a: 0, b: 0, over: false },
       server: starter,
       serverCourt: "R",
+      // ★ 並びは前ゲーム終了時のまま（公式ルールでも固定ではないが、実運用として前の並びから開始しがち）
+      formation: s.formation,
     }));
   };
 
@@ -165,10 +210,14 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
       matchWinner: undefined,
       server: "A",
       serverCourt: "R",
+      formation: {
+        A: { left: "A-L", right: "A-R" },
+        B: { left: "B-L", right: "B-R" },
+      },
     });
   };
 
-  // ★ 手動サーブ交代（誤操作時の救済）
+  // 手動サーブ交代（誤操作時の救済）
   const swapServe = () => {
     pushHistory();
     const nextServer: Side = state.server === "A" ? "B" : "A";
@@ -177,6 +226,15 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
       ...state,
       server: nextServer,
       serverCourt: courtFromPoints(points),
+    });
+  };
+
+  // 手動で左右入れ替え（誤表示の補正が必要なら）
+  const swapLeftRight = (side: Side) => {
+    pushHistory();
+    setState({
+      ...state,
+      formation: rotateServingSide(state.formation, side),
     });
   };
 
@@ -202,22 +260,42 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
     return "プレー中";
   })();
 
+  const serverName = currentServerName(state);
+
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
-        <div>Game {state.gameIndex + 1} / Best of {settings.bestOf}（先取 {need}）</div>
+        <div>
+          Game {state.gameIndex + 1} / Best of {settings.bestOf}（先取 {need}）
+        </div>
 
-        {/* ★ サーブ表示 */}
         <div className={styles.serve}>
+          <span className={styles.modeSwitch}>
+            <label className={styles.labelSmall}>
+              Mode:&nbsp;
+              <select
+                value={mode}
+                onChange={(e) => setMode(e.target.value as Mode)}
+                className={styles.modeSelect}
+                aria-label="試合モード"
+              >
+                <option value="singles">Singles</option>
+                <option value="doubles">Doubles</option>
+              </select>
+            </label>
+          </span>
+
           <span className={styles.serveLabel}>Serve:</span>
           <span className={styles.serveSide}>{state.server}</span>
           <span className={styles.courtBadge}>{state.serverCourt}</span>
+          <span className={styles.serverName}>({serverName})</span>
         </div>
       </div>
 
       <div className={styles.status}>{statusLine}</div>
 
       <div className={styles.board}>
+        {/* A side */}
         <div className={styles.card}>
           <div className={styles.sideRow}>
             <div className={styles.side}>A</div>
@@ -227,6 +305,25 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
               </div>
             )}
           </div>
+
+          {/* ★ A の並び表示 */}
+          <div className={styles.pairRow}>
+            <div className={styles.pairCell}>
+              <div className={styles.pairLabel}>L</div>
+              <div className={styles.pairName}>
+                {state.formation.A.left}
+                {state.server === "A" && state.serverCourt === "L" && <span className={styles.dot} />}
+              </div>
+            </div>
+            <div className={styles.pairCell}>
+              <div className={styles.pairLabel}>R</div>
+              <div className={styles.pairName}>
+                {state.formation.A.right}
+                {state.server === "A" && state.serverCourt === "R" && <span className={styles.dot} />}
+              </div>
+            </div>
+          </div>
+
           <div className={styles.score}>{a}</div>
           <button
             className={styles.pointBtn}
@@ -237,8 +334,15 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
             A +1
           </button>
           <div className={styles.games}>Games: {state.gamesWonA}</div>
+
+          {mode === "doubles" && (
+            <button className={styles.smallBtn} onClick={() => swapLeftRight("A")}>
+              A 左右入替（手動）
+            </button>
+          )}
         </div>
 
+        {/* B side */}
         <div className={styles.card}>
           <div className={styles.sideRow}>
             <div className={styles.side}>B</div>
@@ -248,6 +352,25 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
               </div>
             )}
           </div>
+
+          {/* ★ B の並び表示 */}
+          <div className={styles.pairRow}>
+            <div className={styles.pairCell}>
+              <div className={styles.pairLabel}>L</div>
+              <div className={styles.pairName}>
+                {state.formation.B.left}
+                {state.server === "B" && state.serverCourt === "L" && <span className={styles.dot} />}
+              </div>
+            </div>
+            <div className={styles.pairCell}>
+              <div className={styles.pairLabel}>R</div>
+              <div className={styles.pairName}>
+                {state.formation.B.right}
+                {state.server === "B" && state.serverCourt === "R" && <span className={styles.dot} />}
+              </div>
+            </div>
+          </div>
+
           <div className={styles.score}>{b}</div>
           <button
             className={styles.pointBtn}
@@ -258,6 +381,12 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
             B +1
           </button>
           <div className={styles.games}>Games: {state.gamesWonB}</div>
+
+          {mode === "doubles" && (
+            <button className={styles.smallBtn} onClick={() => swapLeftRight("B")}>
+              B 左右入替（手動）
+            </button>
+          )}
         </div>
       </div>
 
