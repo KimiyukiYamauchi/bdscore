@@ -109,3 +109,7 @@ html {
     color-scheme: dark;
   }
 }
+
+:root {
+  color-scheme: only light; /* ← ダークテーマによる自動反転を防ぐ */
+}
