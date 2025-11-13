@@ -113,11 +113,23 @@ function currentServerName(state: MatchState): string {
   return court === "L" ? pair.left : pair.right;
 }
 
-export default function Scoreboard({ settings }: { settings: MatchSettings }) {
+type Props = {
+  settings: MatchSettings;
+  defaultMode?: "singles" | "doubles";
+  defaultFormation?: {
+    A: { left: string; right: string };
+    B: { left: string; right: string };
+  };
+};
+
+export default function Scoreboard({
+  settings,
+  defaultMode = "doubles",
+  defaultFormation,
+}: Props) {
   const need = useMemo(() => gamesNeeded(settings.bestOf), [settings.bestOf]);
 
-  // ★ ここでモードを切り替え可能（初期は "singles"）
-  const [mode, setMode] = useState<Mode>("doubles"); // ←初期からダブルスを試したい場合は "doubles"
+  const [mode, setMode] = useState<Mode>(defaultMode);
 
   const [state, setState] = useState<MatchState>({
     gameIndex: 0,
@@ -127,8 +139,7 @@ export default function Scoreboard({ settings }: { settings: MatchSettings }) {
     matchOver: false,
     server: "A",
     serverCourt: "R",
-    formation: {
-      // デモ用の仮名。実装拡張で入力可能にできます
+    formation: defaultFormation ?? {
       A: { left: "A-L", right: "A-R" },
       B: { left: "B-L", right: "B-R" },
     },
