@@ -132,21 +132,6 @@ export default function SettingsForm() {
             <b className={styles.subttl}>A サイド</b>
           </div>
           <div className={styles.row}>
-            <label className={styles.label}>Left</label>
-            <select
-              className={styles.select}
-              value={aL}
-              onChange={(e) => setAL(e.target.value)}
-            >
-              <option value="">（選択してください）</option>
-              {PLAYERS.map((p) => (
-                <option key={`al-${p}`} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.row}>
             <label className={styles.label}>Right</label>
             <select
               className={styles.select}
@@ -161,24 +146,24 @@ export default function SettingsForm() {
               ))}
             </select>
           </div>
-
-          <div className={styles.row}>
-            <b className={styles.subttl}>B サイド</b>
-          </div>
           <div className={styles.row}>
             <label className={styles.label}>Left</label>
             <select
               className={styles.select}
-              value={bL}
-              onChange={(e) => setBL(e.target.value)}
+              value={aL}
+              onChange={(e) => setAL(e.target.value)}
             >
               <option value="">（選択してください）</option>
               {PLAYERS.map((p) => (
-                <option key={`bl-${p}`} value={p}>
+                <option key={`al-${p}`} value={p}>
                   {p}
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className={styles.row}>
+            <b className={styles.subttl}>B サイド</b>
           </div>
           <div className={styles.row}>
             <label className={styles.label}>Right</label>
@@ -190,6 +175,21 @@ export default function SettingsForm() {
               <option value="">（選択してください）</option>
               {PLAYERS.map((p) => (
                 <option key={`br-${p}`} value={p}>
+                  {p}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className={styles.row}>
+            <label className={styles.label}>Left</label>
+            <select
+              className={styles.select}
+              value={bL}
+              onChange={(e) => setBL(e.target.value)}
+            >
+              <option value="">（選択してください）</option>
+              {PLAYERS.map((p) => (
+                <option key={`bl-${p}`} value={p}>
                   {p}
                 </option>
               ))}
