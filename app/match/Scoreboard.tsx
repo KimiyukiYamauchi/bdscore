@@ -399,20 +399,23 @@ export default function Scoreboard({
 
           {/* ★ B の並び表示 */}
           <div className={styles.pairRow}>
+            {/* 先に R（右側）を表示 */}
             <div className={styles.pairCell}>
-              <div className={styles.pairLabel}>L</div>
+              <div className={styles.pairLabel}>R</div>
               <div className={styles.pairName}>
-                {safeText(state.formation.B.left, "B-L")}
-                {state.server === "B" && state.serverCourt === "L" && (
+                {state.formation.B.right}
+                {state.server === "B" && state.serverCourt === "R" && (
                   <span className={styles.dot} />
                 )}
               </div>
             </div>
+
+            {/* 次に L（左側）を表示 */}
             <div className={styles.pairCell}>
-              <div className={styles.pairLabel}>R</div>
+              <div className={styles.pairLabel}>L</div>
               <div className={styles.pairName}>
-                {safeText(state.formation.B.right, "B-R")}
-                {state.server === "B" && state.serverCourt === "R" && (
+                {state.formation.B.left}
+                {state.server === "B" && state.serverCourt === "L" && (
                   <span className={styles.dot} />
                 )}
               </div>
