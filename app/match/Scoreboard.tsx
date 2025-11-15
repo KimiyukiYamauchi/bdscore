@@ -231,7 +231,8 @@ export default function Scoreboard({
 
   const resetMatch = () => {
     pushHistory();
-    setState({
+    setState((s) => ({
+      ...s, // ★ 既存の formation / mode / 名前はそのまま残す
       gameIndex: 0,
       gamesWonA: 0,
       gamesWonB: 0,
@@ -240,11 +241,8 @@ export default function Scoreboard({
       matchWinner: undefined,
       server: "A",
       serverCourt: "R",
-      formation: {
-        A: { left: "A-L", right: "A-R" },
-        B: { left: "B-L", right: "B-R" },
-      },
-    });
+      // formation: s.formation   ← 書かなくてOK（...s に含まれている）
+    }));
   };
 
   // 手動サーブ交代（誤操作時の救済）
