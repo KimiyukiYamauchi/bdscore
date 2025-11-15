@@ -35,6 +35,14 @@
   row-gap: 10px;
 }
 
+/* サーブ中のチームカードに背景色を付ける */
+.servingCard {
+  background: #fef9c3; /* 明るい黄色 */
+  border-color: #facc15; /* ボーダーも黄色系に */
+  box-shadow: 0 0 10px rgba(250, 204, 21, 0.3); /* 少し光らせる */
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
 .side {
   font-size: 14px;
   color: #6b7280;

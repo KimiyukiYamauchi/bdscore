@@ -329,7 +329,11 @@ export default function Scoreboard({
 
       <div className={styles.board}>
         {/* A side */}
-        <div className={styles.card}>
+        <div
+          className={`${styles.card} ${
+            state.server === "A" ? styles.servingCard : ""
+          }`}
+        >
           <div className={styles.sideRow}>
             <div className={styles.side}>A</div>
             {state.server === "A" && (
@@ -384,7 +388,11 @@ export default function Scoreboard({
         </div>
 
         {/* B side */}
-        <div className={styles.card}>
+        <div
+          className={`${styles.card} ${
+            state.server === "B" ? styles.servingCard : ""
+          }`}
+        >
           <div className={styles.sideRow}>
             <div className={styles.side}>B</div>
             {state.server === "B" && (
