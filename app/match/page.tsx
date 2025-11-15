@@ -15,7 +15,7 @@ export default function MatchPage({ searchParams }: Props) {
 
   return (
     <main style={{ padding: 24 }}>
-      <h1 style={{ marginBottom: 12 }}>バドミントン スコアボード</h1>
+      {/* <h1 style={{ marginBottom: 12 }}>バドミントン スコアボード</h1> */}
       <p style={{ color: "#6b7280", marginBottom: 20 }}>
         Mode: {mode} ／ Best of: {settings.bestOf} ／ Points to Win:{" "}
         {settings.pointsToWin} ／ Cap: {settings.cap}
