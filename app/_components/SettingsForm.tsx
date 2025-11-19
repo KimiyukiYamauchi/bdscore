@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "@/app/_components/SettingsForm.module.css";
-import { PLAYERS } from "../_lib/players";
+import { usePlayers } from "../_hooks/usePlayers";
 
 export default function SettingsForm() {
   const router = useRouter();
+  const { players, loaded } = usePlayers(); // ★ ここで localStorage 管理のリストを取得
 
   const [mode, setMode] = useState<"singles" | "doubles">("doubles");
   const [bestOf, setBestOf] = useState<1 | 3>(1);
@@ -46,6 +47,13 @@ export default function SettingsForm() {
   return (
     <form className={styles.form} onSubmit={onSubmit}>
       <h1 className={styles.title}>試合設定</h1>
+
+      {/* もしまだ players が読み込み中なら簡単なメッセージ */}
+      {!loaded && (
+        <p style={{ fontSize: 12, color: "#6b7280", marginBottom: 8 }}>
+          選手リストを読み込み中です...
+        </p>
+      )}
 
       <div className={styles.row}>
         <label className={styles.label} htmlFor="mode">
@@ -103,7 +111,7 @@ export default function SettingsForm() {
               onChange={(e) => setA(e.target.value)}
             >
               <option value="">（選択してください）</option>
-              {PLAYERS.map((p) => (
+              {players.map((p) => (
                 <option key={`a-${p}`} value={p}>
                   {p}
                 </option>
@@ -118,7 +126,7 @@ export default function SettingsForm() {
               onChange={(e) => setB(e.target.value)}
             >
               <option value="">（選択してください）</option>
-              {PLAYERS.map((p) => (
+              {players.map((p) => (
                 <option key={`b-${p}`} value={p}>
                   {p}
                 </option>
@@ -139,7 +147,7 @@ export default function SettingsForm() {
               onChange={(e) => setAR(e.target.value)}
             >
               <option value="">（選択してください）</option>
-              {PLAYERS.map((p) => (
+              {players.map((p) => (
                 <option key={`ar-${p}`} value={p}>
                   {p}
                 </option>
@@ -154,7 +162,7 @@ export default function SettingsForm() {
               onChange={(e) => setAL(e.target.value)}
             >
               <option value="">（選択してください）</option>
-              {PLAYERS.map((p) => (
+              {players.map((p) => (
                 <option key={`al-${p}`} value={p}>
                   {p}
                 </option>
@@ -173,7 +181,7 @@ export default function SettingsForm() {
               onChange={(e) => setBR(e.target.value)}
             >
               <option value="">（選択してください）</option>
-              {PLAYERS.map((p) => (
+              {players.map((p) => (
                 <option key={`br-${p}`} value={p}>
                   {p}
                 </option>
@@ -188,7 +196,7 @@ export default function SettingsForm() {
               onChange={(e) => setBL(e.target.value)}
             >
               <option value="">（選択してください）</option>
-              {PLAYERS.map((p) => (
+              {players.map((p) => (
                 <option key={`bl-${p}`} value={p}>
                   {p}
                 </option>
@@ -201,6 +209,19 @@ export default function SettingsForm() {
       <button className={styles.button} type="submit">
         試合開始
       </button>
+
+      <div style={{ marginTop: 12, textAlign: "right" }}>
+        <a
+          href="/players"
+          style={{
+            fontSize: 12,
+            textDecoration: "underline",
+            color: "#2563eb",
+          }}
+        >
+          選手リストを編集する
+        </a>
+      </div>
     </form>
   );
 }
