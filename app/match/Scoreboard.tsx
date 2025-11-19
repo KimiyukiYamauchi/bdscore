@@ -482,6 +482,24 @@ export default function Scoreboard({
         <span>Points to Win: {settings.pointsToWin}</span>
         <span>Cap: {settings.cap}</span>
       </div>
+
+      <a
+        href="/"
+        style={{
+          display: "block",
+          margin: "32px auto",
+          width: "200px",
+          padding: "12px 0",
+          background: "#3b82f6",
+          color: "#fff",
+          borderRadius: 10,
+          textDecoration: "none",
+          fontWeight: 600,
+          textAlign: "center",
+        }}
+      >
+        トップページへ戻る
+      </a>
     </div>
   );
 }
