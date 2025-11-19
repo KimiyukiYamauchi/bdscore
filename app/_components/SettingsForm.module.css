@@ -18,6 +18,7 @@
   gap: 12px;
   align-items: center;
   margin: 12px 0;
+  overflow: hidden; /* 超保険用：横スクロール防止 */
 }
 
 .label {
@@ -26,11 +27,26 @@
 }
 
 .select {
+  width: 100%;
+  max-width: 100%; /* ← はみ出し防止（重要） */
+  box-sizing: border-box; /* ← padding を含めて計算 */
+
+  padding: 8px 32px 8px 10px; /* ← 右側に余白を確保しても overflow しない */
+
   font-size: 16px;
-  padding: 8px 10px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #fff;
+
+  /* Safari / iOS 対策：ネイティブ UI を抑える */
+  -webkit-appearance: none;
+  appearance: none;
+
+  /* 背景にドロップダウンアイコンを自前で置く（任意） */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'><path fill='%239CA3AF' d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 14px;
 }
 
 .button {
