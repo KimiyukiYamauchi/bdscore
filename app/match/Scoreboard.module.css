@@ -24,6 +24,22 @@
   margin: 8px 0 16px;
 }
 
+/* カードごとに「順番」を付ける */
+.cardA {
+  order: 1;
+}
+.cardB {
+  order: 2;
+}
+
+/* flipped のときだけ順番を入れ替える */
+.boardFlipped .cardA {
+  order: 2;
+}
+.boardFlipped .cardB {
+  order: 1;
+}
+
 .card {
   background: #ffffff;
   border: 1px solid #e5e7eb;

@@ -130,6 +130,7 @@ export default function Scoreboard({
   const need = useMemo(() => gamesNeeded(settings.bestOf), [settings.bestOf]);
 
   const [mode, setMode] = useState<Mode>(defaultMode);
+  const [flipped, setFlipped] = useState(false); // ★ 追加：左右入れ替えフラグ
 
   const [state, setState] = useState<MatchState>({
     gameIndex: 0,
@@ -260,6 +261,9 @@ export default function Scoreboard({
   // 手動で左右入れ替え（誤表示の補正が必要なら）
   const swapLeftRight = (side: Side) => {
     pushHistory();
+    const f = deepClone(state.formation);
+    const p = f[side];
+    f[side] = { left: p.right, right: p.left };
     setState({
       ...state,
       formation: rotateServingSide(state.formation, side),
@@ -295,6 +299,57 @@ export default function Scoreboard({
 
   const serverName = currentServerName(state);
 
+  // ★ ここがポイント：画面左・右にどのチームを出すかだけ flipped で切り替え
+  const leftTeam: Side = flipped ? "B" : "A";
+  const rightTeam: Side = flipped ? "A" : "B";
+
+  const scoreOf = (team: Side) => (team === "A" ? a : b);
+  const gamesOf = (team: Side) =>
+    team === "A" ? state.gamesWonA : state.gamesWonB;
+
+  // 画面上の「L/R 2段表示」を組み立てるヘルパー
+  const renderPair = (team: Side, viewSide: "left" | "right") => {
+    const pair = state.formation[team];
+    const topCourt: Court = viewSide === "left" ? "L" : "R";
+    const bottomCourt: Court = viewSide === "left" ? "R" : "L";
+
+    const topLabel = topCourt;
+    const bottomLabel = bottomCourt;
+
+    const topName =
+      topCourt === "L"
+        ? safeText(pair.left, `${team}-L`)
+        : safeText(pair.right, `${team}-R`);
+    const bottomName =
+      bottomCourt === "L"
+        ? safeText(pair.left, `${team}-L`)
+        : safeText(pair.right, `${team}-R`);
+    return (
+      <div className={styles.pairRow}>
+        {/* 上段 */}
+        <div className={styles.pairCell}>
+          <div className={styles.pairLabel}>{topLabel}</div>
+          <div className={styles.pairName}>
+            {topName}
+            {state.server === team && state.serverCourt === topCourt && (
+              <span className={styles.dot} />
+            )}
+          </div>
+        </div>
+        {/* 下段 */}
+        <div className={styles.pairCell}>
+          <div className={styles.pairLabel}>{bottomLabel}</div>
+          <div className={styles.pairName}>
+            {bottomName}
+            {state.server === team && state.serverCourt === bottomCourt && (
+              <span className={styles.dot} />
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -327,16 +382,17 @@ export default function Scoreboard({
 
       <div className={styles.status}>{statusLine}</div>
 
+      {/* boardFlipped は使わず、leftTeam/rightTeam で左右を切替 */}
       <div className={styles.board}>
-        {/* A side */}
+        {/* 左サイド：上から L / R */}
         <div
           className={`${styles.card} ${
-            state.server === "A" ? styles.servingCard : ""
+            state.server === leftTeam ? styles.servingCard : ""
           }`}
         >
           <div className={styles.sideRow}>
-            <div className={styles.side}>A</div>
-            {state.server === "A" && (
+            <div className={styles.side}>{leftTeam}</div>
+            {state.server === leftTeam && (
               <div className={styles.servePill}>
                 サーブ中{" "}
                 <span className={styles.courtMini}>{state.serverCourt}</span>
@@ -344,58 +400,38 @@ export default function Scoreboard({
             )}
           </div>
 
-          {/* ★ A の並び表示 */}
-          <div className={styles.pairRow}>
-            <div className={styles.pairCell}>
-              <div className={styles.pairLabel}>L</div>
-              <div className={styles.pairName}>
-                {safeText(state.formation.A.left, "A-L")}
-                {state.server === "A" && state.serverCourt === "L" && (
-                  <span className={styles.dot} />
-                )}
-              </div>
-            </div>
-            <div className={styles.pairCell}>
-              <div className={styles.pairLabel}>R</div>
-              <div className={styles.pairName}>
-                {safeText(state.formation.A.right, "A-R")}
-                {state.server === "A" && state.serverCourt === "R" && (
-                  <span className={styles.dot} />
-                )}
-              </div>
-            </div>
-          </div>
+          {renderPair(leftTeam, "left")}
 
-          <div className={styles.score}>{a}</div>
+          <div className={styles.score}>{scoreOf(leftTeam)}</div>
           <button
             className={styles.pointBtn}
-            onClick={() => addPoint("A")}
+            onClick={() => addPoint(leftTeam)}
             disabled={state.game.over || state.matchOver}
-            aria-label="Aに1点加算"
+            aria-label={`${leftTeam}に1点加算`}
           >
-            A +1
+            {leftTeam} +1
           </button>
-          <div className={styles.games}>Games: {state.gamesWonA}</div>
+          <div className={styles.games}>Games: {gamesOf(leftTeam)}</div>
 
           {mode === "doubles" && (
             <button
               className={styles.smallBtn}
-              onClick={() => swapLeftRight("A")}
+              onClick={() => swapLeftRight(leftTeam)}
             >
-              A 左右入替（手動）
+              {leftTeam} 左右入替（手動）
             </button>
           )}
         </div>
 
-        {/* B side */}
+        {/* 右サイド：上から R / L */}
         <div
           className={`${styles.card} ${
-            state.server === "B" ? styles.servingCard : ""
+            state.server === rightTeam ? styles.servingCard : ""
           }`}
         >
           <div className={styles.sideRow}>
-            <div className={styles.side}>B</div>
-            {state.server === "B" && (
+            <div className={styles.side}>{rightTeam}</div>
+            {state.server === rightTeam && (
               <div className={styles.servePill}>
                 サーブ中{" "}
                 <span className={styles.courtMini}>{state.serverCourt}</span>
@@ -403,48 +439,25 @@ export default function Scoreboard({
             )}
           </div>
 
-          {/* ★ B の並び表示 */}
-          <div className={styles.pairRow}>
-            {/* 先に R（右側）を表示 */}
-            <div className={styles.pairCell}>
-              <div className={styles.pairLabel}>R</div>
-              <div className={styles.pairName}>
-                {state.formation.B.right}
-                {state.server === "B" && state.serverCourt === "R" && (
-                  <span className={styles.dot} />
-                )}
-              </div>
-            </div>
+          {renderPair(rightTeam, "right")}
 
-            {/* 次に L（左側）を表示 */}
-            <div className={styles.pairCell}>
-              <div className={styles.pairLabel}>L</div>
-              <div className={styles.pairName}>
-                {state.formation.B.left}
-                {state.server === "B" && state.serverCourt === "L" && (
-                  <span className={styles.dot} />
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className={styles.score}>{b}</div>
+          <div className={styles.score}>{scoreOf(rightTeam)}</div>
           <button
             className={styles.pointBtn}
-            onClick={() => addPoint("B")}
+            onClick={() => addPoint(rightTeam)}
             disabled={state.game.over || state.matchOver}
-            aria-label="Bに1点加算"
+            aria-label={`${rightTeam}に1点加算`}
           >
-            B +1
+            {rightTeam} +1
           </button>
-          <div className={styles.games}>Games: {state.gamesWonB}</div>
+          <div className={styles.games}>Games: {gamesOf(rightTeam)}</div>
 
           {mode === "doubles" && (
             <button
               className={styles.smallBtn}
-              onClick={() => swapLeftRight("B")}
+              onClick={() => swapLeftRight(rightTeam)}
             >
-              B 左右入替（手動）
+              {rightTeam} 左右入替（手動）
             </button>
           )}
         </div>
@@ -473,6 +486,19 @@ export default function Scoreboard({
         >
           サーブ交代
         </button>
+
+        {/* ★ 追加：左右入れ替え */}
+        <button
+          className={styles.ctrlBtn}
+          type="button"
+          onClick={() => {
+            pushHistory();
+            setFlipped((v) => !v);
+          }}
+        >
+          サイド入れ替え
+        </button>
+
         <button className={styles.dangerBtn} onClick={resetMatch}>
           マッチをリセット
         </button>
