@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import styles from "@/app/match/Scoreboard.module.css";
+import ScoreCard from "./_components/ScoreCard";
 
 type Side = "A" | "B";
 type Court = "L" | "R";
@@ -307,48 +308,7 @@ export default function Scoreboard({
   const gamesOf = (team: Side) =>
     team === "A" ? state.gamesWonA : state.gamesWonB;
 
-  // 画面上の「L/R 2段表示」を組み立てるヘルパー
-  const renderPair = (team: Side, viewSide: "left" | "right") => {
-    const pair = state.formation[team];
-    const topCourt: Court = viewSide === "left" ? "L" : "R";
-    const bottomCourt: Court = viewSide === "left" ? "R" : "L";
-
-    const topLabel = topCourt;
-    const bottomLabel = bottomCourt;
-
-    const topName =
-      topCourt === "L"
-        ? safeText(pair.left, `${team}-L`)
-        : safeText(pair.right, `${team}-R`);
-    const bottomName =
-      bottomCourt === "L"
-        ? safeText(pair.left, `${team}-L`)
-        : safeText(pair.right, `${team}-R`);
-    return (
-      <div className={styles.pairRow}>
-        {/* 上段 */}
-        <div className={styles.pairCell}>
-          <div className={styles.pairLabel}>{topLabel}</div>
-          <div className={styles.pairName}>
-            {topName}
-            {state.server === team && state.serverCourt === topCourt && (
-              <span className={styles.dot} />
-            )}
-          </div>
-        </div>
-        {/* 下段 */}
-        <div className={styles.pairCell}>
-          <div className={styles.pairLabel}>{bottomLabel}</div>
-          <div className={styles.pairName}>
-            {bottomName}
-            {state.server === team && state.serverCourt === bottomCourt && (
-              <span className={styles.dot} />
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // Pair display and side card are moved to components
 
   return (
     <div className={styles.wrap}>
@@ -384,83 +344,35 @@ export default function Scoreboard({
 
       {/* boardFlipped は使わず、leftTeam/rightTeam で左右を切替 */}
       <div className={styles.board}>
-        {/* 左サイド：上から L / R */}
-        <div
-          className={`${styles.card} ${
-            state.server === leftTeam ? styles.servingCard : ""
-          }`}
-        >
-          <div className={styles.sideRow}>
-            <div className={styles.side}>{leftTeam}</div>
-            {state.server === leftTeam && (
-              <div className={styles.servePill}>
-                サーブ中{" "}
-                <span className={styles.courtMini}>{state.serverCourt}</span>
-              </div>
-            )}
-          </div>
+        {/* 左サイド */}
+        <ScoreCard
+          team={leftTeam}
+          server={state.server}
+          serverCourt={state.serverCourt}
+          pair={state.formation[leftTeam]}
+          viewSide="left"
+          score={scoreOf(leftTeam)}
+          games={gamesOf(leftTeam)}
+          onAddPoint={() => addPoint(leftTeam)}
+          onSwapLeftRight={(t) => swapLeftRight(t)}
+          mode={mode}
+          disabled={state.game.over || state.matchOver}
+        />
 
-          {renderPair(leftTeam, "left")}
-
-          <div className={styles.score}>{scoreOf(leftTeam)}</div>
-          <button
-            className={styles.pointBtn}
-            onClick={() => addPoint(leftTeam)}
-            disabled={state.game.over || state.matchOver}
-            aria-label={`${leftTeam}に1点加算`}
-          >
-            {leftTeam} +1
-          </button>
-          <div className={styles.games}>Games: {gamesOf(leftTeam)}</div>
-
-          {mode === "doubles" && (
-            <button
-              className={styles.smallBtn}
-              onClick={() => swapLeftRight(leftTeam)}
-            >
-              {leftTeam} 左右入替（手動）
-            </button>
-          )}
-        </div>
-
-        {/* 右サイド：上から R / L */}
-        <div
-          className={`${styles.card} ${
-            state.server === rightTeam ? styles.servingCard : ""
-          }`}
-        >
-          <div className={styles.sideRow}>
-            <div className={styles.side}>{rightTeam}</div>
-            {state.server === rightTeam && (
-              <div className={styles.servePill}>
-                サーブ中{" "}
-                <span className={styles.courtMini}>{state.serverCourt}</span>
-              </div>
-            )}
-          </div>
-
-          {renderPair(rightTeam, "right")}
-
-          <div className={styles.score}>{scoreOf(rightTeam)}</div>
-          <button
-            className={styles.pointBtn}
-            onClick={() => addPoint(rightTeam)}
-            disabled={state.game.over || state.matchOver}
-            aria-label={`${rightTeam}に1点加算`}
-          >
-            {rightTeam} +1
-          </button>
-          <div className={styles.games}>Games: {gamesOf(rightTeam)}</div>
-
-          {mode === "doubles" && (
-            <button
-              className={styles.smallBtn}
-              onClick={() => swapLeftRight(rightTeam)}
-            >
-              {rightTeam} 左右入替（手動）
-            </button>
-          )}
-        </div>
+        {/* 右サイド */}
+        <ScoreCard
+          team={rightTeam}
+          server={state.server}
+          serverCourt={state.serverCourt}
+          pair={state.formation[rightTeam]}
+          viewSide="right"
+          score={scoreOf(rightTeam)}
+          games={gamesOf(rightTeam)}
+          onAddPoint={() => addPoint(rightTeam)}
+          onSwapLeftRight={(t) => swapLeftRight(t)}
+          mode={mode}
+          disabled={state.game.over || state.matchOver}
+        />
       </div>
 
       <div className={styles.controls}>
