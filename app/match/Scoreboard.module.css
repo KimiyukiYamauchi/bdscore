@@ -278,3 +278,20 @@
   background: #fff;
   cursor: pointer;
 }
+
+/* Back link used at bottom of scoreboard */
+.backLink {
+  display: block;
+  margin: 32px auto;
+  width: 200px;
+  padding: 12px 0;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  text-align: center;
+}
+.backLink:hover {
+  background: #2563eb;
+}
