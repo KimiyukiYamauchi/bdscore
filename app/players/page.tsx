@@ -3,6 +3,7 @@
 
 import { useState } from "react";
 import { usePlayers } from "../_hooks/usePlayers";
+import Link from "next/link";
 
 export default function PlayersPage() {
   const {
@@ -158,7 +159,7 @@ export default function PlayersPage() {
           >
             デフォルトに戻す
           </button>
-          <a
+          <Link
             href="/"
             style={{
               fontSize: 13,
@@ -168,7 +169,7 @@ export default function PlayersPage() {
             }}
           >
             試合設定画面へ戻る
-          </a>
+          </Link>
         </div>
       </section>
     </main>

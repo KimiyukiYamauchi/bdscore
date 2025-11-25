@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import styles from "@/app/_components/SettingsForm.module.css";
 import { usePlayers } from "../_hooks/usePlayers";
 
@@ -211,7 +212,7 @@ export default function SettingsForm() {
       </button>
 
       <div style={{ marginTop: 12, textAlign: "right" }}>
-        <a
+        <Link
           href="/players"
           style={{
             fontSize: 12,
@@ -220,7 +221,7 @@ export default function SettingsForm() {
           }}
         >
           選手リストを編集する
-        </a>
+        </Link>
       </div>
     </form>
   );
