@@ -1,0 +1,126 @@
+.main {
+  padding: 24px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.description {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.section {
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.sectionAdd {
+  background: #f9fafb;
+}
+
+.sectionList {
+  background: #fff;
+}
+
+.sectionTitle {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.sectionListTitle {
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+
+.emptyMessage {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.form {
+  display: flex;
+  gap: 8px;
+}
+
+.formInput {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.formButton {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  background: #10b981;
+  color: #fff;
+  cursor: pointer;
+}
+
+.playerList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.playerItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.playerInput {
+  flex: 1;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+}
+
+.deleteButton {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  font-size: 12px;
+  background: #ef4444;
+  color: #fff;
+  cursor: pointer;
+}
+
+.footer {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.resetButton {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 12px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.backLink {
+  font-size: 13px;
+  text-decoration: underline;
+  color: #2563eb;
+  align-self: center;
+}
+.backLink:hover {
+  color: #1d4ed8;
+}

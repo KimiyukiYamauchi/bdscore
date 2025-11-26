@@ -212,14 +212,7 @@ export default function SettingsForm() {
       </button>
 
       <div style={{ marginTop: 12, textAlign: "right" }}>
-        <Link
-          href="/players"
-          style={{
-            fontSize: 12,
-            textDecoration: "underline",
-            color: "#2563eb",
-          }}
-        >
+        <Link href="/players" className={styles.editPlayersLink}>
           選手リストを編集する
         </Link>
       </div>

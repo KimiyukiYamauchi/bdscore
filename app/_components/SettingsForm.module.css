@@ -69,3 +69,13 @@
 .subttl {
   color: #374151;
 }
+
+/* Link to edit players page */
+.editPlayersLink {
+  font-size: 12px;
+  text-decoration: underline;
+  color: #2563eb;
+}
+.editPlayersLink:hover {
+  color: #1d4ed8;
+}
