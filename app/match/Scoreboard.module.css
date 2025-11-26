@@ -25,20 +25,8 @@
 }
 
 /* カードごとに「順番」を付ける */
-.cardA {
-  order: 1;
-}
-.cardB {
-  order: 2;
-}
-
-/* flipped のときだけ順番を入れ替える */
-.boardFlipped .cardA {
-  order: 2;
-}
-.boardFlipped .cardB {
-  order: 1;
-}
+/* (以前はカードごとの順序入替用のクラスがありましたが、
+   現在は `flipped` ロジックを使わず左右を切替しているため削除しました) */
 
 .card {
   background: #ffffff;
