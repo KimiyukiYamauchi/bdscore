@@ -1,6 +1,7 @@
 import { buildSettings, toMode, buildFormation } from "../_lib/parse";
 import type { Formation, Mode } from "../_lib/types";
 import Scoreboard from "./Scoreboard";
+import styles from "./page.module.css";
 
 type Props = {
   searchParams?: { [key: string]: string | string[] | undefined };
@@ -14,9 +15,9 @@ export default function MatchPage({ searchParams }: Props) {
   const initialFormation: Formation = buildFormation(sp as any, mode);
 
   return (
-    <main style={{ padding: 24 }}>
+    <main className={styles.main}>
       {/* <h1 style={{ marginBottom: 12 }}>バドミントン スコアボード</h1> */}
-      <p style={{ color: "#6b7280", marginBottom: 20 }}>
+      <p className={styles.infoText}>
         Mode: {mode} ／ Best of: {settings.bestOf} ／ Points to Win:{" "}
         {settings.pointsToWin} ／ Cap: {settings.cap}
       </p>
