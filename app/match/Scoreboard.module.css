@@ -144,6 +144,59 @@
   margin-bottom: 12px;
 }
 
+/* ★ 追加：ポップアップ用スタイル */
+/* 画面全体を覆う半透明の背景 */
+.backdrop {
+  position: fixed;
+  inset: 0; /* top: 0; right: 0; bottom: 0; left: 0; と同じ */
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* 中央の白いポップアップ */
+.popup {
+  background-color: #ffffff;
+  padding: 24px 32px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  max-width: 80%;
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* メッセージ文字 */
+.message {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+/* OK ボタン */
+.popup-button {
+  padding: 8px 24px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: #4caf50;
+  color: white;
+}
+
+/* ちょっとしたアニメーション */
+@keyframes fadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* ★ サーブ表示（ヘッダ右側） */
 .serve {
   display: inline-flex;

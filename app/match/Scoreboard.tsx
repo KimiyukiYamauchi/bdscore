@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import styles from "@/app/match/Scoreboard.module.css";
 import Link from "next/link";
 import ScoreCard from "./_components/ScoreCard";
@@ -281,9 +281,11 @@ export default function Scoreboard({
   const bGamePoint =
     !state.game.over &&
     winsIfScores(a, b, "B", settings.pointsToWin, settings.cap);
-
   const aMatchPoint = aGamePoint && state.gamesWonA === need - 1;
   const bMatchPoint = bGamePoint && state.gamesWonB === need - 1;
+
+  const [popupMessage, setPopupMessage] = useState<string | null>(null);
+  const prevStatusRef = useRef<string | null>(null);
 
   const statusLine = (() => {
     if (state.matchOver) return `マッチ終了：${state.matchWinner} 勝利`;
@@ -298,6 +300,51 @@ export default function Scoreboard({
     if (bGamePoint) return "B ゲームポイント";
     return "プレー中";
   })();
+
+  useEffect(() => {
+    const prev = prevStatusRef.current;
+    const current = statusLine;
+
+    // まったく同じなら何もしない
+    if (prev === current) {
+      return;
+    }
+
+    // --- ここから「前には無かったのに今は含まれているか？」をチェック ---
+
+    // マッチ終了
+    if (!prev?.includes("マッチ終了") && current.includes("マッチ終了")) {
+      setPopupMessage(current); // 「マッチ終了：A 勝利」などそのまま表示
+    }
+    // ゲーム終了（マッチ終了で return しないよう else にしない）
+    if (!prev?.includes("ゲーム終了") && current.includes("ゲーム終了")) {
+      setPopupMessage(current); // 「ゲーム終了：A がこのゲームに勝利」
+    }
+    // マッチポイント（A/B/両者 まとめて）
+    if (
+      !prev?.includes("マッチポイント") &&
+      current.includes("マッチポイント")
+    ) {
+      setPopupMessage(current); // 「A マッチポイント」など
+    }
+    // デュース
+    if (!prev?.includes("デュース") && current.includes("デュース")) {
+      setPopupMessage("デュースになりました！");
+    }
+
+    // 最後に現在値を覚えておく
+    prevStatusRef.current = current;
+  }, [statusLine]);
+
+  useEffect(() => {
+    if (!popupMessage) return;
+
+    const timer = setTimeout(() => {
+      setPopupMessage(null);
+    }, 2000); // 2秒後に閉じる
+
+    return () => clearTimeout(timer);
+  }, [popupMessage]);
 
   const serverName = currentServerName(state);
 
@@ -342,6 +389,21 @@ export default function Scoreboard({
       </div>
 
       <div className={styles.status}>{statusLine}</div>
+
+      {/* ★ 追加：ポップアップ */}
+      {popupMessage && (
+        <div className={styles.popupBackdrop}>
+          <div className={styles.popup}>
+            <p className={styles.message}>{popupMessage}</p>
+            <button
+              className={styles.popupButton}
+              onClick={() => setPopupMessage(null)}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* boardFlipped は使わず、leftTeam/rightTeam で左右を切替 */}
       <div className={styles.board}>
