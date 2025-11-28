@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Badminton Scorekeeper",
+  title: "BadScore",
   description: "A simple badminton scorekeeping web app",
 };
 
