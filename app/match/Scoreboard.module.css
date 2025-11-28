@@ -165,6 +165,9 @@
   text-align: center;
   max-width: 80%;
   animation: fadeIn 0.2s ease-out;
+
+  /* ★ ここを追加：ポップアップ内の文字は黒で固定 */
+  color: #000000;
 }
 
 /* メッセージ文字 */
