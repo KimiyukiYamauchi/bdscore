@@ -287,17 +287,37 @@ export default function Scoreboard({
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
   const prevStatusRef = useRef<string | null>(null);
 
+  const getWinnerTeamLabel = () => {
+    if (!state.matchWinner) return "";
+
+    const winnerSide = state.matchWinner; // "A" または "B"
+    const pair = state.formation[winnerSide]; // Pair型 { left: string; right: string }
+
+    const leftName = pair.left;
+    const rightName = pair.right;
+
+    return `${leftName}＆${rightName}チーム勝利！`;
+  };
+
   const statusLine = (() => {
-    if (state.matchOver) return `マッチ終了：${state.matchWinner} 勝利`;
+    if (state.matchOver) {
+      // ★ マッチ終了時だけ選手名を使った表記にする
+      return getWinnerTeamLabel();
+    }
+
     if (state.game.over)
       return `ゲーム終了：${state.game.winner} がこのゲームに勝利`;
+
     if (isDeuce(a, b, settings.pointsToWin, settings.cap)) return "デュース";
+
     if (aMatchPoint && bMatchPoint) return "両者マッチポイント";
     if (aMatchPoint) return "A マッチポイント";
     if (bMatchPoint) return "B マッチポイント";
+
     if (aGamePoint && bGamePoint) return "両者ゲームポイント";
     if (aGamePoint) return "A ゲームポイント";
     if (bGamePoint) return "B ゲームポイント";
+
     return "プレー中";
   })();
 
@@ -313,8 +333,8 @@ export default function Scoreboard({
     // --- ここから「前には無かったのに今は含まれているか？」をチェック ---
 
     // マッチ終了
-    if (!prev?.includes("マッチ終了") && current.includes("マッチ終了")) {
-      setPopupMessage(current); // 「マッチ終了：A 勝利」などそのまま表示
+    if (!prev?.includes("チーム勝利！") && current.includes("チーム勝利！")) {
+      setPopupMessage(current); // 「きゃん＆よこたチーム勝利！」などそのまま表示
     }
     // ゲーム終了（マッチ終了で return しないよう else にしない）
     if (!prev?.includes("ゲーム終了") && current.includes("ゲーム終了")) {
@@ -338,6 +358,11 @@ export default function Scoreboard({
 
   useEffect(() => {
     if (!popupMessage) return;
+
+    // ★ 「チーム勝利！」のときは自動で閉じない
+    if (popupMessage.includes("チーム勝利！")) {
+      return;
+    }
 
     const timer = setTimeout(() => {
       setPopupMessage(null);
