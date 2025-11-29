@@ -356,20 +356,20 @@ export default function Scoreboard({
     prevStatusRef.current = current;
   }, [statusLine]);
 
-  useEffect(() => {
-    if (!popupMessage) return;
+  // useEffect(() => {
+  //   if (!popupMessage) return;
 
-    // ★ 「チーム勝利！」のときは自動で閉じない
-    if (popupMessage.includes("チーム勝利！")) {
-      return;
-    }
+  //   // ★ 「チーム勝利！」のときは自動で閉じない
+  //   if (popupMessage.includes("チーム勝利！")) {
+  //     return;
+  //   }
 
-    const timer = setTimeout(() => {
-      setPopupMessage(null);
-    }, 2000); // 2秒後に閉じる
+  //   const timer = setTimeout(() => {
+  //     setPopupMessage(null);
+  //   }, 2000); // 2秒後に閉じる
 
-    return () => clearTimeout(timer);
-  }, [popupMessage]);
+  //   return () => clearTimeout(timer);
+  // }, [popupMessage]);
 
   const serverName = currentServerName(state);
 
