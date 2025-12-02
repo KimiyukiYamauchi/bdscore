@@ -10,7 +10,7 @@ export default function SettingsForm() {
   const router = useRouter();
   const { players, loaded } = usePlayers(); // ★ ここで localStorage 管理のリストを取得
 
-  const [mode, setMode] = useState<"singles" | "doubles">("doubles");
+  const mode = "doubles" as const; // ← 常にダブルス扱い
   const [bestOf, setBestOf] = useState<1 | 3>(1);
   const [pointsToWin, setPointsToWin] = useState<15 | 21>(15);
 
@@ -32,15 +32,10 @@ export default function SettingsForm() {
       pointsToWin: String(pointsToWin),
     });
 
-    if (mode === "singles") {
-      if (a) params.set("a", a);
-      if (b) params.set("b", b);
-    } else {
-      if (aL) params.set("aL", aL);
-      if (aR) params.set("aR", aR);
-      if (bL) params.set("bL", bL);
-      if (bR) params.set("bR", bR);
-    }
+    if (aL) params.set("aL", aL);
+    if (aR) params.set("aR", aR);
+    if (bL) params.set("bL", bL);
+    if (bR) params.set("bR", bR);
 
     router.push(`/match?${params.toString()}`);
   };
@@ -57,18 +52,8 @@ export default function SettingsForm() {
       )}
 
       <div className={styles.row}>
-        <label className={styles.label} htmlFor="mode">
-          Mode
-        </label>
-        <select
-          id="mode"
-          className={styles.select}
-          value={mode}
-          onChange={(e) => setMode(e.target.value as "singles" | "doubles")}
-        >
-          <option value="singles">Singles</option>
-          <option value="doubles">Doubles</option>
-        </select>
+        <span className={styles.label}>Mode</span>
+        <span className={styles.modeFixed}>Doubles（ダブルス専用）</span>
       </div>
 
       <div className={styles.row}>
@@ -101,111 +86,78 @@ export default function SettingsForm() {
         </select>
       </div>
 
-      {/* 選手選択：モードで切替 */}
-      {mode === "singles" ? (
-        <>
-          <div className={styles.row}>
-            <label className={styles.label}>A 選手</label>
-            <select
-              className={styles.select}
-              value={a}
-              onChange={(e) => setA(e.target.value)}
-            >
-              <option value="">（選択してください）</option>
-              {players.map((p) => (
-                <option key={`a-${p}`} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.row}>
-            <label className={styles.label}>B 選手</label>
-            <select
-              className={styles.select}
-              value={b}
-              onChange={(e) => setB(e.target.value)}
-            >
-              <option value="">（選択してください）</option>
-              {players.map((p) => (
-                <option key={`b-${p}`} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className={styles.row}>
-            <b className={styles.subttl}>A サイド</b>
-          </div>
-          <div className={styles.row}>
-            <label className={styles.label}>Right</label>
-            <select
-              className={styles.select}
-              value={aR}
-              onChange={(e) => setAR(e.target.value)}
-            >
-              <option value="">（選択してください）</option>
-              {players.map((p) => (
-                <option key={`ar-${p}`} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.row}>
-            <label className={styles.label}>Left</label>
-            <select
-              className={styles.select}
-              value={aL}
-              onChange={(e) => setAL(e.target.value)}
-            >
-              <option value="">（選択してください）</option>
-              {players.map((p) => (
-                <option key={`al-${p}`} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* ★ ダブルス専用：A/Bサイドの Left / Right を選択 */}
+      <div className={styles.row}>
+        <b className={styles.subttl}>A サイド</b>
+      </div>
 
-          <div className={styles.row}>
-            <b className={styles.subttl}>B サイド</b>
-          </div>
-          <div className={styles.row}>
-            <label className={styles.label}>Right</label>
-            <select
-              className={styles.select}
-              value={bR}
-              onChange={(e) => setBR(e.target.value)}
-            >
-              <option value="">（選択してください）</option>
-              {players.map((p) => (
-                <option key={`br-${p}`} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className={styles.row}>
-            <label className={styles.label}>Left</label>
-            <select
-              className={styles.select}
-              value={bL}
-              onChange={(e) => setBL(e.target.value)}
-            >
-              <option value="">（選択してください）</option>
-              {players.map((p) => (
-                <option key={`bl-${p}`} value={p}>
-                  {p}
-                </option>
-              ))}
-            </select>
-          </div>
-        </>
-      )}
+      <div className={styles.row}>
+        <label className={styles.label}>Right</label>
+        <select
+          className={styles.select}
+          value={aR}
+          onChange={(e) => setAR(e.target.value)}
+        >
+          <option value="">（選択してください）</option>
+          {players.map((p) => (
+            <option key={`ar-${p}`} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className={styles.row}>
+        <label className={styles.label}>Left</label>
+        <select
+          className={styles.select}
+          value={aL}
+          onChange={(e) => setAL(e.target.value)}
+        >
+          <option value="">（選択してください）</option>
+          {players.map((p) => (
+            <option key={`al-${p}`} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className={styles.row}>
+        <b className={styles.subttl}>B サイド</b>
+      </div>
+
+      <div className={styles.row}>
+        <label className={styles.label}>Right</label>
+        <select
+          className={styles.select}
+          value={bR}
+          onChange={(e) => setBR(e.target.value)}
+        >
+          <option value="">（選択してください）</option>
+          {players.map((p) => (
+            <option key={`br-${p}`} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className={styles.row}>
+        <label className={styles.label}>Left</label>
+        <select
+          className={styles.select}
+          value={bL}
+          onChange={(e) => setBL(e.target.value)}
+        >
+          <option value="">（選択してください）</option>
+          {players.map((p) => (
+            <option key={`bl-${p}`} value={p}>
+              {p}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <button className={styles.button} type="submit">
         試合開始

@@ -26,6 +26,11 @@
   color: #374151;
 }
 
+.modeFixed {
+  color: #374151;
+  font-weight: bold;
+}
+
 .select {
   width: 100%;
   max-width: 100%; /* ← はみ出し防止（重要） */

@@ -117,21 +117,16 @@ function currentServerName(state: MatchState): string {
 
 type Props = {
   settings: MatchSettings;
-  defaultMode?: "singles" | "doubles";
   defaultFormation?: {
     A: { left: string; right: string };
     B: { left: string; right: string };
   };
 };
 
-export default function Scoreboard({
-  settings,
-  defaultMode = "doubles",
-  defaultFormation,
-}: Props) {
+export default function Scoreboard({ settings, defaultFormation }: Props) {
   const need = useMemo(() => gamesNeeded(settings.bestOf), [settings.bestOf]);
 
-  const [mode, setMode] = useState<Mode>(defaultMode);
+  const mode: Mode = "doubles"; // ← 常にダブルス扱い
   const [flipped, setFlipped] = useState(false); // ★ 追加：左右入れ替えフラグ
 
   const [state, setState] = useState<MatchState>({
@@ -394,18 +389,7 @@ export default function Scoreboard({
 
         <div className={styles.serve}>
           <span className={styles.modeSwitch}>
-            <label className={styles.labelSmall}>
-              Mode:&nbsp;
-              <select
-                value={mode}
-                onChange={(e) => setMode(e.target.value as Mode)}
-                className={styles.modeSelect}
-                aria-label="試合モード"
-              >
-                <option value="singles">Singles</option>
-                <option value="doubles">Doubles</option>
-              </select>
-            </label>
+            <span className={styles.labelSmall}>Mode: Doubles</span>
           </span>
 
           <span className={styles.serveLabel}>Serve:</span>
