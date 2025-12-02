@@ -273,11 +273,35 @@ export default function Scoreboard({ settings, defaultFormation }: Props) {
   const aGamePoint =
     !state.game.over &&
     winsIfScores(a, b, "A", settings.pointsToWin, settings.cap);
+
   const bGamePoint =
     !state.game.over &&
     winsIfScores(a, b, "B", settings.pointsToWin, settings.cap);
-  const aMatchPoint = aGamePoint && state.gamesWonA === need - 1;
-  const bMatchPoint = bGamePoint && state.gamesWonB === need - 1;
+
+  // ★ このポイントを取ったら「ゲームも取り、かつマッチが終わるか？」で判定
+  const isMatchPoint = (who: Side): boolean => {
+    if (state.matchOver || state.game.over) return false;
+
+    // そもそもこの1点でゲームが終わらないならマッチポイントではない
+    const willWinGame = winsIfScores(
+      a,
+      b,
+      who,
+      settings.pointsToWin,
+      settings.cap
+    );
+    if (!willWinGame) return false;
+
+    // このゲームを取ったあとのゲーム数をシミュレーション
+    const nextGamesWonA = state.gamesWonA + (who === "A" ? 1 : 0);
+    const nextGamesWonB = state.gamesWonB + (who === "B" ? 1 : 0);
+
+    // その時点で必要ゲーム数(need)に到達していればマッチ終了
+    return nextGamesWonA >= need || nextGamesWonB >= need;
+  };
+
+  const aMatchPoint = isMatchPoint("A");
+  const bMatchPoint = isMatchPoint("B");
 
   const [popupMessage, setPopupMessage] = useState<string | null>(null);
   const prevStatusRef = useRef<string | null>(null);
@@ -345,6 +369,13 @@ export default function Scoreboard({ settings, defaultFormation }: Props) {
     // デュース
     if (!prev?.includes("デュース") && current.includes("デュース")) {
       setPopupMessage("デュースになりました！");
+    }
+    // ゲームポイント
+    if (
+      !prev?.includes("ゲームポイント") &&
+      current.includes("ゲームポイント")
+    ) {
+      setPopupMessage(current);
     }
 
     // 最後に現在値を覚えておく
