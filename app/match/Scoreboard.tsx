@@ -383,6 +383,8 @@ export default function Scoreboard({
 
   // Pair display and side card are moved to components
 
+  const isWinPopup = popupMessage?.includes("チーム勝利！");
+
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -416,10 +418,33 @@ export default function Scoreboard({
       <div className={styles.status}>{statusLine}</div>
 
       {/* ★ 追加：ポップアップ */}
+      {/* ★ 勝利時だけトロフィー＋花吹雪を出す */}
       {popupMessage && (
         <div className={styles.popupBackdrop}>
-          <div className={styles.popup}>
+          <div
+            className={`${styles.popup} ${isWinPopup ? styles.popupWin : ""}`}
+          >
+            {/* 勝利時だけトロフィー＆花吹雪 */}
+            {isWinPopup && (
+              <>
+                <div className={styles.trophy}>🏆</div>
+
+                <div className={styles.confetti}>
+                  {/* 紙吹雪パーツをいくつか並べる */}
+                  <span className={styles.confettiPiece} />
+                  <span className={styles.confettiPiece} />
+                  <span className={styles.confettiPiece} />
+                  <span className={styles.confettiPiece} />
+                  <span className={styles.confettiPiece} />
+                  <span className={styles.confettiPiece} />
+                  <span className={styles.confettiPiece} />
+                  <span className={styles.confettiPiece} />
+                </div>
+              </>
+            )}
+
             <p className={styles.message}>{popupMessage}</p>
+
             <button
               className={styles.popupButton}
               onClick={() => setPopupMessage(null)}
