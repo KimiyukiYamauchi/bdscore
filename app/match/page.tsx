@@ -23,7 +23,6 @@ export default function MatchPage({ searchParams }: Props) {
       </p>
       <Scoreboard
         settings={settings}
-        defaultMode={mode}
         defaultFormation={initialFormation}
       />
     </main>
