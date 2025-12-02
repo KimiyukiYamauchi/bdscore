@@ -3,7 +3,7 @@
 import { useMemo, useState, useRef, useEffect } from "react";
 import styles from "@/app/match/Scoreboard.module.css";
 import Link from "next/link";
-import ScoreCard from "./_components/ScoreCard";
+import ScoreCard from "@/app/_components/ScoreCard";
 
 type Side = "A" | "B";
 type Court = "L" | "R";
