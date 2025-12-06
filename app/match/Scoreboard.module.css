@@ -27,6 +27,32 @@
   margin: 8px 0 16px;
 }
 
+/* 勝ったサイドの見た目を強調 */
+.sideWinner {
+  position: relative;
+  border-radius: 16px;
+  padding: 8px; /* ScoreCard 周りにちょっと余白を足す */
+  box-shadow: 0 0 0 3px #ffc107, 0 0 20px rgba(255, 193, 7, 0.7);
+  background: radial-gradient(circle at top, #fff8e1, #ffffff 60%);
+  transform: scale(1.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 勝利バッジ（任意で） */
+.sideWinner::before {
+  content: "🏆WIN!🎉";
+  position: absolute;
+  top: -10px;
+  right: 12px;
+  background: #ffc107;
+  color: #000;
+  font-weight: 700;
+  font-size: 20px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
 /* カードごとに「順番」を付ける */
 /* (以前はカードごとの順序入替用のクラスがありましたが、
    現在は `flipped` ロジックを使わず左右を切替しているため削除しました) */

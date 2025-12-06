@@ -411,6 +411,9 @@ export default function Scoreboard({ settings, defaultFormation }: Props) {
 
   const isWinPopup = popupMessage?.includes("チーム勝利！");
 
+  const isLeftWinner = state.matchOver && state.matchWinner === leftTeam;
+  const isRightWinner = state.matchOver && state.matchWinner === rightTeam;
+
   return (
     <div className={styles.wrap}>
       <div className={styles.header}>
@@ -473,36 +476,42 @@ export default function Scoreboard({ settings, defaultFormation }: Props) {
       {/* boardFlipped は使わず、leftTeam/rightTeam で左右を切替 */}
       <div className={styles.board}>
         {/* 左サイド */}
-        <ScoreCard
-          team={leftTeam}
-          server={state.server}
-          serverCourt={state.serverCourt}
-          pair={state.formation[leftTeam]}
-          viewSide="left"
-          score={scoreOf(leftTeam)}
-          games={gamesOf(leftTeam)}
-          onAddPoint={() => addPoint(leftTeam)}
-          onSwapLeftRight={(t) => swapLeftRight(t)}
-          mode={mode}
-          disabled={state.game.over || state.matchOver}
-        />
-
+        <div
+          className={`${styles.side} ${isLeftWinner ? styles.sideWinner : ""}`}
+        >
+          <ScoreCard
+            team={leftTeam}
+            server={state.server}
+            serverCourt={state.serverCourt}
+            pair={state.formation[leftTeam]}
+            viewSide="left"
+            score={scoreOf(leftTeam)}
+            games={gamesOf(leftTeam)}
+            onAddPoint={() => addPoint(leftTeam)}
+            onSwapLeftRight={(t) => swapLeftRight(t)}
+            mode={mode}
+            disabled={state.game.over || state.matchOver}
+          />
+        </div>
         {/* 右サイド */}
-        <ScoreCard
-          team={rightTeam}
-          server={state.server}
-          serverCourt={state.serverCourt}
-          pair={state.formation[rightTeam]}
-          viewSide="right"
-          score={scoreOf(rightTeam)}
-          games={gamesOf(rightTeam)}
-          onAddPoint={() => addPoint(rightTeam)}
-          onSwapLeftRight={(t) => swapLeftRight(t)}
-          mode={mode}
-          disabled={state.game.over || state.matchOver}
-        />
+        <div
+          className={`${styles.side} ${isRightWinner ? styles.sideWinner : ""}`}
+        >
+          <ScoreCard
+            team={rightTeam}
+            server={state.server}
+            serverCourt={state.serverCourt}
+            pair={state.formation[rightTeam]}
+            viewSide="right"
+            score={scoreOf(rightTeam)}
+            games={gamesOf(rightTeam)}
+            onAddPoint={() => addPoint(rightTeam)}
+            onSwapLeftRight={(t) => swapLeftRight(t)}
+            mode={mode}
+            disabled={state.game.over || state.matchOver}
+          />
+        </div>
       </div>
-
       <div className={styles.controls}>
         <button
           className={styles.ctrlBtn}
