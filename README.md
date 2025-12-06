@@ -94,14 +94,15 @@ npm run dev
 │ ├── PlayersPage.module.css
 │ └── page.tsx # 選手リスト編集ページ
 │
+├── public
+│
+├── .eslintrc.json
+├── .gitignore
 ├── next-env.d.ts
 ├── next.config.mjs
-├── node_modules # ライブラリ群
 ├── package-lock.json
 ├── package.json
-├── public
-├── tsconfig.json
-└── tsconfig.tsbuildinfo
+└── tsconfig.json
 ```
 
 ## 🙌 作者
