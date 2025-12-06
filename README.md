@@ -56,7 +56,7 @@ npm install
 npm run dev
 ```
 
-## 📁 主なディレクトリ構造
+## 📁 ディレクトリ構造
 
 ```python
 .
@@ -87,7 +87,7 @@ npm run dev
 │ │ ├── page.module.css
 │ │ └── page.tsx # スコアページ
 │ │
-│ ├── page.module.css
+│ ├── page.module.css # トップ画面のスタイル
 │ ├── page.tsx # トップ画面：試合設定ページ
 │ │
 │ └── players
@@ -96,11 +96,10 @@ npm run dev
 │
 ├── next-env.d.ts
 ├── next.config.mjs
-├── node_modules
+├── node_modules # ライブラリ群
 ├── package-lock.json
 ├── package.json
 ├── public
-├── tree.txt
 ├── tsconfig.json
 └── tsconfig.tsbuildinfo
 ```
