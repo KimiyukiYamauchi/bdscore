@@ -5,13 +5,10 @@
 
 ---
 
-## 🚀 デモ
+## 🚀 実行環境
 
-- **アプリ本番（Vercel）**  
+- **Vercel**  
   https://bdscore.vercel.app/
-
-- **GitHub リポジトリ**  
-  https://github.com/KimiyukiYamauchi/bdscore
 
 ---
 
