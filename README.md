@@ -106,3 +106,7 @@ npm run dev
 
 山内 公之（Kimiyuki Yamauchi）  
 IT カレッジ沖縄 非常勤講師
+
+## 📝 ライセンス
+
+MIT License
