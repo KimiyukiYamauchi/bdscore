@@ -11,7 +11,7 @@ type Mode = "singles" | "doubles";
 
 export type MatchSettings = {
   bestOf: 1 | 3;
-  pointsToWin: 15 | 21;
+  pointsToWin: 11 | 15 | 21;
   cap: number; // 15点制なら21、21点制なら30
 };
 
@@ -60,7 +60,7 @@ function winsIfScores(
   b: number,
   who: Side,
   pointsToWin: number,
-  cap: number
+  cap: number,
 ): boolean {
   const na = who === "A" ? a + 1 : a;
   const nb = who === "B" ? b + 1 : b;
@@ -74,7 +74,7 @@ function judgeGame(
   a: number,
   b: number,
   pointsToWin: number,
-  cap: number
+  cap: number,
 ): { over: boolean; winner?: Side } {
   if (a >= cap || b >= cap) return { over: true, winner: a > b ? "A" : "B" };
   const diff = Math.abs(a - b);
@@ -88,7 +88,7 @@ function isDeuce(
   a: number,
   b: number,
   pointsToWin: number,
-  cap: number
+  cap: number,
 ): boolean {
   const threshold = pointsToWin - 1;
   return a >= threshold && b >= threshold && a === b && a < cap && b < cap;
@@ -288,7 +288,7 @@ export default function Scoreboard({ settings, defaultFormation }: Props) {
       b,
       who,
       settings.pointsToWin,
-      settings.cap
+      settings.cap,
     );
     if (!willWinGame) return false;
 
