@@ -1,6 +1,6 @@
 // app/_lib/types.ts
 export type BestOf = 1 | 3;
-export type PointsToWin = 15 | 21;
+export type PointsToWin = 11 | 15 | 21;
 export type Mode = "singles" | "doubles";
 
 export type MatchSettings = {

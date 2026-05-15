@@ -12,18 +12,18 @@ export function toBestOf(v: unknown, fallback: BestOf = 3): BestOf {
 }
 export function toPointsToWin(
   v: unknown,
-  fallback: PointsToWin = 21
+  fallback: PointsToWin = 21,
 ): PointsToWin {
   const n = Number(v);
-  return n === 15 || n === 21 ? (n as PointsToWin) : fallback;
+  return n === 11 || n === 15 || n === 21 ? (n as PointsToWin) : fallback;
 }
 export function buildSettings(
   bestOfRaw: unknown,
-  ptwRaw: unknown
+  ptwRaw: unknown,
 ): MatchSettings {
   const bestOf = toBestOf(bestOfRaw);
   const pointsToWin = toPointsToWin(ptwRaw);
-  const cap = pointsToWin === 21 ? 30 : 21;
+  const cap = pointsToWin === 11 ? 15 : pointsToWin === 15 ? 21 : 30;
   return { bestOf, pointsToWin, cap };
 }
 

@@ -12,7 +12,7 @@ export default function SettingsForm() {
 
   const mode = "doubles" as const; // ← 常にダブルス扱い
   const [bestOf, setBestOf] = useState<1 | 3>(1);
-  const [pointsToWin, setPointsToWin] = useState<15 | 21>(15);
+  const [pointsToWin, setPointsToWin] = useState<11 | 15 | 21>(15);
 
   // singles 用
   const [a, setA] = useState("");
@@ -79,8 +79,11 @@ export default function SettingsForm() {
           id="pointsToWin"
           className={styles.select}
           value={pointsToWin}
-          onChange={(e) => setPointsToWin(Number(e.target.value) as 15 | 21)}
+          onChange={(e) =>
+            setPointsToWin(Number(e.target.value) as 11 | 15 | 21)
+          }
         >
+          <option value={11}>11 点先取（上限 15）</option>
           <option value={15}>15 点先取（上限 21）</option>
           <option value={21}>21 点先取（上限 30）</option>
         </select>
