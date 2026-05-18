@@ -6,6 +6,7 @@ export const DEFAULT_PLAYERS = [
   "よこた",
   "くらもと",
   "とくざと",
+  "すずき",
   "やまうち",
 ];
 
