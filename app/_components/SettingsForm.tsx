@@ -6,6 +6,37 @@ import Link from "next/link";
 import styles from "@/app/_components/SettingsForm.module.css";
 import { usePlayers } from "../_hooks/usePlayers";
 
+// 選手選択の select。他の枠で選択済みの選手は選べないようにする
+function PlayerSelect({
+  players,
+  value,
+  onChange,
+  taken,
+}: {
+  players: string[];
+  value: string;
+  onChange: (value: string) => void;
+  taken: string[];
+}) {
+  return (
+    <select
+      className={styles.select}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+    >
+      <option value="">（選択してください）</option>
+      {players.map((p) => {
+        const takenElsewhere = p !== value && taken.includes(p);
+        return (
+          <option key={p} value={p} disabled={takenElsewhere}>
+            {takenElsewhere ? `${p}（選択済み）` : p}
+          </option>
+        );
+      })}
+    </select>
+  );
+}
+
 export default function SettingsForm() {
   const router = useRouter();
   const { players, loaded } = usePlayers(); // ★ ここで localStorage 管理のリストを取得
@@ -14,18 +45,23 @@ export default function SettingsForm() {
   const [bestOf, setBestOf] = useState<1 | 3>(1);
   const [pointsToWin, setPointsToWin] = useState<11 | 15 | 21>(15);
 
-  // singles 用
-  const [a, setA] = useState("");
-  const [b, setB] = useState("");
-
   // doubles 用
   const [aL, setAL] = useState("");
   const [aR, setAR] = useState("");
   const [bL, setBL] = useState("");
   const [bR, setBR] = useState("");
+  const [error, setError] = useState("");
+
+  // いずれかの枠で選択されている選手
+  const taken = [aL, aR, bL, bR].filter((p) => p !== "");
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (new Set(taken).size !== taken.length) {
+      setError("同じ選手が複数の枠で選択されています");
+      return;
+    }
+    setError("");
     const params = new URLSearchParams({
       mode,
       bestOf: String(bestOf),
@@ -99,34 +135,22 @@ export default function SettingsForm() {
 
       <div className={styles.row}>
         <label className={styles.label}>Right</label>
-        <select
-          className={styles.select}
+        <PlayerSelect
+          players={players}
           value={aR}
-          onChange={(e) => setAR(e.target.value)}
-        >
-          <option value="">（選択してください）</option>
-          {players.map((p) => (
-            <option key={`ar-${p}`} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
+          onChange={setAR}
+          taken={taken}
+        />
       </div>
 
       <div className={styles.row}>
         <label className={styles.label}>Left</label>
-        <select
-          className={styles.select}
+        <PlayerSelect
+          players={players}
           value={aL}
-          onChange={(e) => setAL(e.target.value)}
-        >
-          <option value="">（選択してください）</option>
-          {players.map((p) => (
-            <option key={`al-${p}`} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
+          onChange={setAL}
+          taken={taken}
+        />
       </div>
 
       <div className={styles.row}>
@@ -135,35 +159,29 @@ export default function SettingsForm() {
 
       <div className={styles.row}>
         <label className={styles.label}>Right</label>
-        <select
-          className={styles.select}
+        <PlayerSelect
+          players={players}
           value={bR}
-          onChange={(e) => setBR(e.target.value)}
-        >
-          <option value="">（選択してください）</option>
-          {players.map((p) => (
-            <option key={`br-${p}`} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
+          onChange={setBR}
+          taken={taken}
+        />
       </div>
 
       <div className={styles.row}>
         <label className={styles.label}>Left</label>
-        <select
-          className={styles.select}
+        <PlayerSelect
+          players={players}
           value={bL}
-          onChange={(e) => setBL(e.target.value)}
-        >
-          <option value="">（選択してください）</option>
-          {players.map((p) => (
-            <option key={`bl-${p}`} value={p}>
-              {p}
-            </option>
-          ))}
-        </select>
+          onChange={setBL}
+          taken={taken}
+        />
       </div>
+
+      {error && (
+        <p className={styles.errorMessage} role="alert">
+          {error}
+        </p>
+      )}
 
       <button className={styles.button} type="submit">
         試合開始

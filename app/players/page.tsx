@@ -13,7 +13,8 @@ function PlayerNameInput({
   onCommit,
 }: {
   name: string;
-  onCommit: (name: string) => void;
+  // 確定できなかった（重複など）場合は false を返す
+  onCommit: (name: string) => boolean;
 }) {
   const [draft, setDraft] = useState(name);
 
@@ -29,7 +30,10 @@ function PlayerNameInput({
       setDraft(name);
       return;
     }
-    if (trimmed !== name) onCommit(trimmed);
+    if (trimmed !== name && !onCommit(trimmed)) {
+      setDraft(name);
+      return;
+    }
     setDraft(trimmed);
   };
 
@@ -58,6 +62,11 @@ export default function PlayersPage() {
   } = usePlayers();
 
   const [newName, setNewName] = useState("");
+  const [addError, setAddError] = useState("");
+  const [listError, setListError] = useState("");
+
+  const duplicateMessage = (name: string) =>
+    `「${name}」はすでに登録されています`;
 
   if (!loaded) {
     return <main style={{ padding: 24 }}>読み込み中...</main>;
@@ -77,7 +86,13 @@ export default function PlayersPage() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            addPlayer(newName);
+            const trimmed = newName.trim();
+            if (!trimmed) return;
+            if (!addPlayer(trimmed)) {
+              setAddError(duplicateMessage(trimmed));
+              return;
+            }
+            setAddError("");
             setNewName("");
           }}
           className={styles.form}
@@ -85,7 +100,10 @@ export default function PlayersPage() {
           <input
             type="text"
             value={newName}
-            onChange={(e) => setNewName(e.target.value)}
+            onChange={(e) => {
+              setNewName(e.target.value);
+              setAddError("");
+            }}
             placeholder="例）山内 公之"
             className={styles.formInput}
           />
@@ -93,6 +111,11 @@ export default function PlayersPage() {
             追加
           </button>
         </form>
+        {addError && (
+          <p className={styles.errorMessage} role="alert">
+            {addError}
+          </p>
+        )}
       </section>
 
       {/* リスト編集 */}
@@ -107,7 +130,11 @@ export default function PlayersPage() {
               <li key={i} className={styles.playerItem}>
                 <PlayerNameInput
                   name={p}
-                  onCommit={(name) => updatePlayer(i, name)}
+                  onCommit={(name) => {
+                    const ok = updatePlayer(i, name);
+                    setListError(ok ? "" : duplicateMessage(name));
+                    return ok;
+                  }}
                 />
                 <button
                   type="button"
@@ -119,6 +146,11 @@ export default function PlayersPage() {
               </li>
             ))}
           </ul>
+        )}
+        {listError && (
+          <p className={styles.errorMessage} role="alert">
+            {listError}
+          </p>
         )}
 
         <div className={styles.footer}>

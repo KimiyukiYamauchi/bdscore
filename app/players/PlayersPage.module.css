@@ -45,6 +45,12 @@
   font-size: 14px;
 }
 
+.errorMessage {
+  margin-top: 8px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
 .form {
   display: flex;
   gap: 8px;

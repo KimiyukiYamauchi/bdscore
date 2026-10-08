@@ -54,6 +54,12 @@
   background-size: 14px;
 }
 
+.errorMessage {
+  margin-bottom: 8px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
 .button {
   margin-top: 20px;
   width: 100%;

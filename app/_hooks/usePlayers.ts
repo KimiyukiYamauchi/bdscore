@@ -17,7 +17,9 @@ export function usePlayers() {
       try {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          setPlayers(parsed.filter((p) => typeof p === "string"));
+          // 以前のバージョンで登録された重複は取り除く
+          const names = parsed.filter((p): p is string => typeof p === "string");
+          setPlayers(Array.from(new Set(names)));
           setLoaded(true);
           return;
         }
@@ -38,19 +40,23 @@ export function usePlayers() {
     }
   };
 
-  const addPlayer = (name: string) => {
+  // 同じ名前がすでに登録されていれば false を返して追加しない
+  const addPlayer = (name: string): boolean => {
     const trimmed = name.trim();
-    if (!trimmed) return;
-    // 重複を避けたい場合はフィルタリング
+    if (!trimmed || players.includes(trimmed)) return false;
     save([...players, trimmed]);
+    return true;
   };
 
-  const updatePlayer = (index: number, name: string) => {
+  // 他の選手と同じ名前になる場合は false を返して変更しない
+  const updatePlayer = (index: number, name: string): boolean => {
     const trimmed = name.trim();
-    if (!trimmed) return;
+    if (!trimmed) return false;
+    if (players.some((p, i) => i !== index && p === trimmed)) return false;
     const next = [...players];
     next[index] = trimmed;
     save(next);
+    return true;
   };
 
   const removePlayer = (index: number) => {
