@@ -107,21 +107,78 @@
   text-rendering: optimizeLegibility;
 }
 
+/* 得点ボタン：左にチームのバッジ、右に大きな「+1」 */
 .pointBtn {
   width: 100%;
-  padding: 12px 14px;
-  font-size: 16px;
-  font-weight: 600;
+  min-height: 64px; /* スマホで押しやすい高さ */
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
   border: none;
-  border-radius: 10px;
-  background: #10b981;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #34d399 0%, #059669 100%);
   color: #fff;
+  box-shadow:
+    0 4px 0 #047857,
+    0 6px 14px rgba(5, 150, 105, 0.35);
   cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* 連打時のダブルタップズームを防ぐ */
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease,
+    filter 0.15s ease;
+}
+
+.pointBtn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+/* 押した時に沈み込む */
+.pointBtn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow:
+    0 1px 0 #047857,
+    0 2px 6px rgba(5, 150, 105, 0.3);
+}
+
+.pointBtn:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 2px;
 }
 
 .pointBtn:disabled {
-  opacity: 0.5;
+  background: #d1d5db;
+  color: #f9fafb;
+  box-shadow: none;
   cursor: not-allowed;
+}
+
+/* チーム名のバッジ */
+.pointBtnTeam {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* 「+1」 */
+.pointBtnPlus {
+  font-size: 32px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
 }
 
 .games {

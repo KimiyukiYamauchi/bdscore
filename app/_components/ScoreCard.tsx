@@ -60,7 +60,8 @@ export default function ScoreCard({
         disabled={disabled}
         aria-label={`${team}に1点加算`}
       >
-        {team} +1
+        <span className={styles.pointBtnTeam}>{team}</span>
+        <span className={styles.pointBtnPlus}>+1</span>
       </button>
       <div className={styles.games}>Games: {games}</div>
 
