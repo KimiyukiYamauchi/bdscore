@@ -63,10 +63,12 @@ export default function Scoreboard({
   const [history, setHistory] = useState<MatchState[]>([]);
   const [restored, setRestored] = useState(false);
 
-  // offerFlip が true のときはポップアップに「サイド入れ替え」ボタンを出す
+  // offerFlip: 「サイド入れ替え」ボタンを出す / win: マッチ勝利（トロフィー表示）
+  // どちらかが true のポップアップは自動で閉じず、OK を押すまで表示する
   const [popup, setPopup] = useState<{
     message: string;
     offerFlip?: boolean;
+    win?: boolean;
   } | null>(null);
   const popupMessage = popup?.message ?? null;
 
@@ -227,7 +229,7 @@ export default function Scoreboard({
 
     // マッチ終了
     if (!prev?.includes("チーム勝利！") && current.includes("チーム勝利！")) {
-      setPopup({ message: current }); // 「きゃん＆よこたチーム勝利！」などそのまま表示
+      setPopup({ message: current, win: true }); // 「きゃん＆よこたチーム勝利！」などそのまま表示
     }
     // ゲーム終了（マッチ終了で return しないよう else にしない）
     if (!prev?.includes("ゲーム終了") && current.includes("ゲーム終了")) {
@@ -256,20 +258,16 @@ export default function Scoreboard({
     prevStatusRef.current = current;
   }, [restored, statusLine]);
 
-  // useEffect(() => {
-  //   if (!popupMessage) return;
+  // ゲームポイント・デュース等の案内は2秒後に自動で閉じる
+  useEffect(() => {
+    if (!popup || popup.win || popup.offerFlip) return;
 
-  //   // ★ 「チーム勝利！」のときは自動で閉じない
-  //   if (popupMessage.includes("チーム勝利！")) {
-  //     return;
-  //   }
+    const timer = setTimeout(() => {
+      setPopup(null);
+    }, 2000);
 
-  //   const timer = setTimeout(() => {
-  //     setPopup(null);
-  //   }, 2000); // 2秒後に閉じる
-
-  //   return () => clearTimeout(timer);
-  // }, [popupMessage]);
+    return () => clearTimeout(timer);
+  }, [popup]);
 
   const serverName = currentServerName(state);
 
@@ -283,7 +281,7 @@ export default function Scoreboard({
 
   // Pair display and side card are moved to components
 
-  const isWinPopup = popupMessage?.includes("チーム勝利！");
+  const isWinPopup = popup?.win;
 
   const isLeftWinner = state.matchOver && state.matchWinner === leftTeam;
   const isRightWinner = state.matchOver && state.matchWinner === rightTeam;
