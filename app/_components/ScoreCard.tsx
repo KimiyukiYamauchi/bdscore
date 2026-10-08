@@ -3,11 +3,7 @@
 import React from "react";
 import styles from "@/app/match/Scoreboard.module.css";
 import PairDisplay from "./PairDisplay";
-
-type Side = "A" | "B";
-type Court = "L" | "R";
-type Pair = { left: string; right: string };
-type Mode = "singles" | "doubles";
+import type { Court, Mode, Pair, Side } from "@/app/_lib/types";
 
 type Props = {
   team: Side;

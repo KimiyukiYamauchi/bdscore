@@ -13,6 +13,7 @@ export default function MatchPage({ searchParams }: Props) {
 
   const mode: Mode = toMode(sp.mode);
   const initialFormation: Formation = buildFormation(sp as any, mode);
+  const matchId = typeof sp.id === "string" ? sp.id : undefined;
 
   return (
     <main className={styles.main}>
@@ -24,6 +25,7 @@ export default function MatchPage({ searchParams }: Props) {
       <Scoreboard
         settings={settings}
         defaultFormation={initialFormation}
+        matchId={matchId}
       />
     </main>
   );

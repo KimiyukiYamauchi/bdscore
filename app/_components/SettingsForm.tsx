@@ -37,6 +37,9 @@ export default function SettingsForm() {
     if (bL) params.set("bL", bL);
     if (bR) params.set("bR", bR);
 
+    // 試合ごとの ID（リロード時に同じ試合の状態を復元するため）
+    params.set("id", Date.now().toString(36));
+
     router.push(`/match?${params.toString()}`);
   };
 

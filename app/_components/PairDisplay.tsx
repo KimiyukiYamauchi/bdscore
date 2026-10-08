@@ -2,10 +2,7 @@
 
 import styles from "@/app/match/Scoreboard.module.css";
 import React from "react";
-
-type Side = "A" | "B";
-type Court = "L" | "R";
-type Pair = { left: string; right: string };
+import type { Court, Pair, Side } from "@/app/_lib/types";
 
 type Props = {
   pair: Pair;

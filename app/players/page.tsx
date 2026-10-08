@@ -1,10 +1,51 @@
 // app/players/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { usePlayers } from "../_hooks/usePlayers";
 import Link from "next/link";
 import styles from "./PlayersPage.module.css";
+
+// 入力中は下書きとして保持し、フォーカスが外れた時（または Enter）に確定する。
+// 1文字ごとに trim して保存するとスペースが打てない・全消しできないため。
+function PlayerNameInput({
+  name,
+  onCommit,
+}: {
+  name: string;
+  onCommit: (name: string) => void;
+}) {
+  const [draft, setDraft] = useState(name);
+
+  // 削除やリセットで外側の値が変わったら追従する
+  useEffect(() => {
+    setDraft(name);
+  }, [name]);
+
+  const commit = () => {
+    const trimmed = draft.trim();
+    if (!trimmed) {
+      // 空のまま確定しようとしたら元の名前に戻す
+      setDraft(name);
+      return;
+    }
+    if (trimmed !== name) onCommit(trimmed);
+    setDraft(trimmed);
+  };
+
+  return (
+    <input
+      type="text"
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") e.currentTarget.blur();
+      }}
+      className={styles.playerInput}
+    />
+  );
+}
 
 export default function PlayersPage() {
   const {
@@ -64,11 +105,9 @@ export default function PlayersPage() {
           <ul className={styles.playerList}>
             {players.map((p, i) => (
               <li key={i} className={styles.playerItem}>
-                <input
-                  type="text"
-                  value={p}
-                  onChange={(e) => updatePlayer(i, e.target.value)}
-                  className={styles.playerInput}
+                <PlayerNameInput
+                  name={p}
+                  onCommit={(name) => updatePlayer(i, name)}
                 />
                 <button
                   type="button"
