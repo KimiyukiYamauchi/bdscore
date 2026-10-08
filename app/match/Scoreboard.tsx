@@ -16,8 +16,11 @@ import {
   currentServerName,
   gamesNeeded,
   initialMatchState,
+  intervalPoint,
   isDeuce,
+  isFinalGame,
   isMatchPoint,
+  reachedInterval,
   resetMatch as applyReset,
   startNextGame,
   swapPair,
@@ -59,6 +62,13 @@ export default function Scoreboard({
   );
   const [history, setHistory] = useState<MatchState[]>([]);
   const [restored, setRestored] = useState(false);
+
+  // offerFlip が true のときはポップアップに「サイド入れ替え」ボタンを出す
+  const [popup, setPopup] = useState<{
+    message: string;
+    offerFlip?: boolean;
+  } | null>(null);
+  const popupMessage = popup?.message ?? null;
 
   // リロード時などに localStorage から試合状態を復元
   useEffect(() => {
@@ -105,8 +115,34 @@ export default function Scoreboard({
     setHistory(history.slice(0, -1));
   };
 
-  const addPoint = (who: Side) => apply((s) => applyPoint(s, who, settings));
-  const nextGame = () => apply(startNextGame);
+  const addPoint = (who: Side) => {
+    const next = applyPoint(state, who, settings);
+    apply(() => next);
+
+    // インターバル（ファイナルゲームではエンド交代も）の案内
+    if (reachedInterval(state, next, settings)) {
+      const point = intervalPoint(settings.pointsToWin);
+      setPopup(
+        isFinalGame(next, settings)
+          ? {
+              message: `${point}点インターバル：エンドを交代してください`,
+              offerFlip: true,
+            }
+          : { message: `${point}点インターバルです` },
+      );
+    }
+  };
+
+  const nextGame = () => {
+    const next = startNextGame(state);
+    if (next === state) return;
+    apply(() => next);
+    // ゲーム間は毎回エンドを交代する
+    setPopup({
+      message: `第${next.gameIndex + 1}ゲーム開始：エンドを交代してください`,
+      offerFlip: true,
+    });
+  };
   const resetMatch = () => {
     if (!window.confirm("マッチをリセットしますか？")) return;
     apply(applyReset);
@@ -133,7 +169,6 @@ export default function Scoreboard({
   const aMatchPoint = isMatchPoint(state, "A", settings);
   const bMatchPoint = isMatchPoint(state, "B", settings);
 
-  const [popupMessage, setPopupMessage] = useState<string | null>(null);
   const prevStatusRef = useRef<string | null>(null);
 
   const getWinnerTeamLabel = () => {
@@ -192,29 +227,29 @@ export default function Scoreboard({
 
     // マッチ終了
     if (!prev?.includes("チーム勝利！") && current.includes("チーム勝利！")) {
-      setPopupMessage(current); // 「きゃん＆よこたチーム勝利！」などそのまま表示
+      setPopup({ message: current }); // 「きゃん＆よこたチーム勝利！」などそのまま表示
     }
     // ゲーム終了（マッチ終了で return しないよう else にしない）
     if (!prev?.includes("ゲーム終了") && current.includes("ゲーム終了")) {
-      setPopupMessage(current); // 「ゲーム終了：A がこのゲームに勝利」
+      setPopup({ message: current }); // 「ゲーム終了：A がこのゲームに勝利」
     }
     // マッチポイント（A/B/両者 まとめて）
     if (
       !prev?.includes("マッチポイント") &&
       current.includes("マッチポイント")
     ) {
-      setPopupMessage(current); // 「A マッチポイント」など
+      setPopup({ message: current }); // 「A マッチポイント」など
     }
     // デュース
     if (!prev?.includes("デュース") && current.includes("デュース")) {
-      setPopupMessage("デュースになりました！");
+      setPopup({ message: "デュースになりました！" });
     }
     // ゲームポイント
     if (
       !prev?.includes("ゲームポイント") &&
       current.includes("ゲームポイント")
     ) {
-      setPopupMessage(current);
+      setPopup({ message: current });
     }
 
     // 最後に現在値を覚えておく
@@ -230,7 +265,7 @@ export default function Scoreboard({
   //   }
 
   //   const timer = setTimeout(() => {
-  //     setPopupMessage(null);
+  //     setPopup(null);
   //   }, 2000); // 2秒後に閉じる
 
   //   return () => clearTimeout(timer);
@@ -302,12 +337,25 @@ export default function Scoreboard({
 
             <p className={styles.message}>{popupMessage}</p>
 
-            <button
-              className={styles.popupButton}
-              onClick={() => setPopupMessage(null)}
-            >
-              OK
-            </button>
+            <div className={styles.popupButtons}>
+              {popup?.offerFlip && (
+                <button
+                  className={`${styles.popupButton} ${styles.popupButtonSub}`}
+                  onClick={() => {
+                    flipSides();
+                    setPopup(null);
+                  }}
+                >
+                  サイド入れ替え
+                </button>
+              )}
+              <button
+                className={styles.popupButton}
+                onClick={() => setPopup(null)}
+              >
+                OK
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -376,11 +424,7 @@ export default function Scoreboard({
         </button>
 
         {/* ★ 追加：左右入れ替え */}
-        <button
-          className={styles.ctrlBtn}
-          type="button"
-          onClick={flipSides}
-        >
+        <button className={styles.ctrlBtn} type="button" onClick={flipSides}>
           サイド入れ替え
         </button>
 

@@ -387,6 +387,21 @@
   transform: scale(0.95);
 }
 
+/* ポップアップのボタン並び */
+.popupButtons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* 「サイド入れ替え」など OK 以外のボタン */
+.popupButtonSub {
+  background-color: #ffffff;
+  color: #ff5722;
+  border: 2px solid #ff5722;
+}
+
 /* ちょっとしたアニメーション */
 @keyframes fadeIn {
   from {

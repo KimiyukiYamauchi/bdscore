@@ -161,9 +161,36 @@ export function isMatchPoint(
 ): boolean {
   if (state.matchOver || state.game.over) return false;
   const { a, b } = state.game;
-  if (!winsIfScores(a, b, who, settings.pointsToWin, settings.cap)) return false;
+  if (!winsIfScores(a, b, who, settings.pointsToWin, settings.cap))
+    return false;
   const need = gamesNeeded(settings.bestOf);
   const wonA = state.gamesWonA + (who === "A" ? 1 : 0);
   const wonB = state.gamesWonB + (who === "B" ? 1 : 0);
   return wonA >= need || wonB >= need;
+}
+
+// インターバルを取る点数（21点制なら11点。15・11点制は規定点の半分を切り上げ）
+export function intervalPoint(pointsToWin: number): number {
+  return Math.ceil(pointsToWin / 2);
+}
+
+// ファイナルゲーム（3ゲームマッチの第3ゲーム、または1ゲームマッチ）か
+export function isFinalGame(
+  state: MatchState,
+  settings: MatchSettings,
+): boolean {
+  return state.gameIndex === settings.bestOf - 1;
+}
+
+// prev → next の1点で、リードしている側が初めてインターバルの点数に達したか
+export function reachedInterval(
+  prev: MatchState,
+  next: MatchState,
+  settings: MatchSettings,
+): boolean {
+  if (next.gameIndex !== prev.gameIndex || next.game.over) return false;
+  const point = intervalPoint(settings.pointsToWin);
+  const before = Math.max(prev.game.a, prev.game.b);
+  const after = Math.max(next.game.a, next.game.b);
+  return before < point && after >= point;
 }

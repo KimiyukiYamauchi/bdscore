@@ -5,9 +5,12 @@ import {
   courtFromPoints,
   currentServerName,
   initialMatchState,
+  intervalPoint,
   isDeuce,
+  isFinalGame,
   isMatchPoint,
   judgeGame,
+  reachedInterval,
   resetMatch,
   startNextGame,
   swapServe,
@@ -169,5 +172,39 @@ describe("手動操作", () => {
     expect(swapped.server).toBe(s.server === "A" ? "B" : "A");
     const pts = swapped.server === "A" ? s.game.a : s.game.b;
     expect(swapped.serverCourt).toBe(courtFromPoints(pts));
+  });
+});
+
+describe("インターバルとエンド交代", () => {
+  it.each([
+    [21, 11],
+    [15, 8],
+    [11, 6],
+  ])("%i 点制のインターバルは %i 点", (ptw, point) => {
+    expect(intervalPoint(ptw)).toBe(point);
+  });
+
+  it("リードしている側が初めて11点に達した1点だけで true", () => {
+    const at10 = playTo(10, 7, bo1_21);
+    const at11 = addPoint(at10, "A", bo1_21);
+    expect(reachedInterval(at10, at11, bo1_21)).toBe(true);
+
+    // その後に相手が11点に達してもインターバルにはならない
+    const b10 = playTo(11, 10, bo1_21);
+    expect(reachedInterval(b10, addPoint(b10, "B", bo1_21), bo1_21)).toBe(
+      false,
+    );
+  });
+
+  it("11点に届かない得点では false", () => {
+    const s = playTo(5, 5, bo1_21);
+    expect(reachedInterval(s, addPoint(s, "A", bo1_21), bo1_21)).toBe(false);
+  });
+
+  it("ファイナルゲームは3ゲームマッチの第3ゲーム、1ゲームマッチの第1ゲーム", () => {
+    const first = initialMatchState(FORMATION);
+    expect(isFinalGame(first, bo1_21)).toBe(true);
+    expect(isFinalGame(first, bo3_21)).toBe(false);
+    expect(isFinalGame({ ...first, gameIndex: 2 }, bo3_21)).toBe(true);
   });
 });
