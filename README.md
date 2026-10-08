@@ -18,6 +18,7 @@
 
 - 21 点制（cap 30）
 - 15 点制（cap 21）
+- 11 点制（cap 15）
 - デュース処理
 - ゲームポイント / マッチポイント判定
 - Best of 1 / 3 対応
@@ -32,10 +33,16 @@
 - 左右表示を反転するだけで、試合状態は保持
 - 実際のスコアラー視点に合わせて調整可能
 
+### ✔️ アンドゥ・試合状態の保存
+
+- 得点・サーブ交代・サイド入れ替えなどの操作をアンドゥで取り消せる
+- 試合状態は localStorage に保存され、リロードしても続きから再開できる
+
 ### ✔️ 選手リスト編集（localStorage）
 
 - 選手の追加・削除・更新が可能
 - localStorage に保存されるため入力の手間が省ける
+- 同じ名前の重複登録や、同じ選手を複数の枠に選ぶことを防止
 
 ### ✔️ スマホ最適化
 
@@ -53,12 +60,19 @@ npm install
 npm run dev
 ```
 
+## 🧪 テスト
+
+スコア計算・サーブ・ローテーションなどのルールは [Vitest](https://vitest.dev/) でテストしています。
+
+```bash
+npm test
+```
+
 ## 📁 ディレクトリ構造
 
 ```python
 .
 ├── README.md # 本ファイル
-├── README2.md # 元のnextのプロジェクトを作成した際についていたREADME.mdをリネームした
 ├── app
 │ ├── _components
 │ │ ├── PairDisplay.tsx # ペア表示（L/R 2段表示）
@@ -72,6 +86,8 @@ npm run dev
 │ ├── _lib
 │ │ ├── parse.ts # 試合設定のパース・ルール関連
 │ │ ├── players.ts # 初期選手データ
+│ │ ├── rules.ts # スコア計算・サーブ・ローテーションのルール
+│ │ ├── rules.test.ts # rules.ts のテスト
 │ │ └── types.ts # 型定義
 │ │
 │ ├── favicon.ico
@@ -80,7 +96,7 @@ npm run dev
 │ │
 │ ├── match
 │ │ ├── Scoreboard.module.css # スコアボードのスタイル
-│ │ ├── Scoreboard.tsx # スコアボード本体（ロジック & UI）
+│ │ ├── Scoreboard.tsx # スコアボード本体（UI・状態管理）
 │ │ ├── page.module.css
 │ │ └── page.tsx # スコアページ
 │ │
