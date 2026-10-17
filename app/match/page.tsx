@@ -4,11 +4,11 @@ import Scoreboard from "./Scoreboard";
 import styles from "./page.module.css";
 
 type Props = {
-  searchParams?: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
-export default function MatchPage({ searchParams }: Props) {
-  const sp = searchParams ?? {};
+export default async function MatchPage({ searchParams }: Props) {
+  const sp = await searchParams;
   const settings = buildSettings(sp.bestOf, sp.pointsToWin);
 
   const mode: Mode = toMode(sp.mode);
